@@ -21,9 +21,22 @@
 		F0FD16822D3EA756009CF9A7 /* CartButlerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CartButlerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		F09674342D3EBAEC0018247C /* Exceptions for "CartButler" folder in "CartButler" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Config/Info.plist,
+			);
+			target = F0FD166E2D3EA755009CF9A7 /* CartButler */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		F0FD16712D3EA755009CF9A7 /* CartButler */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				F09674342D3EBAEC0018247C /* Exceptions for "CartButler" folder in "CartButler" target */,
+			);
 			path = CartButler;
 			sourceTree = "<group>";
 		};
@@ -319,14 +332,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = CartButler/CartButler.entitlements;
+				CODE_SIGN_ENTITLEMENTS = CartButler/Config/CartButler.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"CartButler/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"CartButler/Assets/Preview\"";
 				DEVELOPMENT_TEAM = 5S284KMJJS;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CartButler/Config/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.shopping";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -360,14 +374,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = CartButler/CartButler.entitlements;
+				CODE_SIGN_ENTITLEMENTS = CartButler/Config/CartButler.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"CartButler/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"CartButler/Assets/Preview\"";
 				DEVELOPMENT_TEAM = 5S284KMJJS;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CartButler/Config/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.shopping";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
