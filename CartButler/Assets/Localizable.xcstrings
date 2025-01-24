@@ -1,0 +1,40 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Add Item" : {
+
+    },
+    "CartButler" : {
+
+    },
+    "Dairy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laticínios"
+          }
+        }
+      }
+    },
+    "Item at %@" : {
+
+    },
+    "Laundry" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lavanderia"
+          }
+        }
+      }
+    },
+    "Select an item" : {
+
+    }
+  },
+  "version" : "1.0"
+}

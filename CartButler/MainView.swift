@@ -11,9 +11,13 @@ struct MainView: View {
 
   var body: some View {
     ZStack(alignment: .top) {
-      Text("CartButler")
-        .font(.largeTitle)
-        .padding(.top, 100)
+      VStack {
+        Text("CartButler")
+          .font(.largeTitle)
+        Text("Laundry")
+        Text("Dairy")
+      }
+      .padding(.top, 100)
       butlerImage
     }
   }
@@ -41,6 +45,12 @@ struct MainView: View {
   }
 }
 
-#Preview {
+#Preview("English") {
   MainView()
+}
+
+
+#Preview("pt-BR") {
+  MainView()
+    .environment(\.locale, .init(identifier: "pt-BR"))
 }
