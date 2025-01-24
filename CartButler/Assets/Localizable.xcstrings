@@ -4,8 +4,15 @@
     "Add Item" : {
 
     },
-    "CartButler" : {
-
+    "Cart" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carrinho"
+          }
+        }
+      }
     },
     "Dairy" : {
       "extractionState" : "manual",
@@ -28,6 +35,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lavanderia"
+          }
+        }
+      }
+    },
+    "Search" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesquisar"
+          }
+        }
+      }
+    },
+    "Search products" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesquisar produtos"
           }
         }
       }
