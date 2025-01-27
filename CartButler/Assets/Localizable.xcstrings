@@ -1,9 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Add Item" : {
-
-    },
     "Cart" : {
       "localizations" : {
         "pt-BR" : {
@@ -24,9 +21,6 @@
           }
         }
       }
-    },
-    "Item at %@" : {
-
     },
     "Laundry" : {
       "extractionState" : "manual",
@@ -58,9 +52,6 @@
           }
         }
       }
-    },
-    "Select an item" : {
-
     }
   },
   "version" : "1.0"
