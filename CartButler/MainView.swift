@@ -10,37 +10,15 @@ import SwiftUI
 struct MainView: View {
 
   var body: some View {
-    ZStack(alignment: .top) {
-      VStack {
-        Text("CartButler")
-          .font(.largeTitle)
-        Text("Laundry")
-        Text("Dairy")
-      }
-      .padding(.top, 100)
-      butlerImage
-    }
-  }
-
-  private var butlerImage: some View {
-    GeometryReader { geometry in
-      VStack(spacing: .zero) {
-        Spacer()
-        HStack {
-          Spacer()
-          VStack(alignment: .center, spacing: .zero) {
-            Image(.butlerNoBackground)
-              .resizable()
-              .frame(
-                width: geometry.size.height / 3,
-                height: geometry.size.height / 3
-              )
-              .aspectRatio(1, contentMode: .fit)
-          }
-          Spacer()
+    TabView {
+      HomeView()
+        .tabItem {
+          Label("Search", systemImage: "magnifyingglass")
         }
-        Spacer()
-      }
+      Text("Cart")
+        .tabItem {
+          Label("Cart", systemImage: "cart")
+        }
     }
   }
 }

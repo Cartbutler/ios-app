@@ -1,11 +1,15 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Add Item" : {
-
-    },
-    "CartButler" : {
-
+    "Cart" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carrinho"
+          }
+        }
+      }
     },
     "Dairy" : {
       "extractionState" : "manual",
@@ -18,9 +22,6 @@
         }
       }
     },
-    "Item at %@" : {
-
-    },
     "Laundry" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -32,8 +33,25 @@
         }
       }
     },
-    "Select an item" : {
-
+    "Search" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesquisar"
+          }
+        }
+      }
+    },
+    "Search products" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesquisar produtos"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
