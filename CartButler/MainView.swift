@@ -19,9 +19,9 @@ struct MainView: View {
         .tabItem {
           Label("Cart", systemImage: "cart")
         }
-      Text("Settings")
+      Text("Account")
         .tabItem {
-          Label("Settings", systemImage: "gearshape")
+          Label("Account", systemImage: "person")
         }
     }
   }
