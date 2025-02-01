@@ -10,27 +10,29 @@ struct CategoryTile: View {
   let category: Category
   
   var body: some View {
-    HStack {
-      Spacer()
-      VStack {
+    ZStack {
+      RoundedRectangle(cornerRadius: 16)
+        .fill(Color.themeSurface)
+        .stroke(.themePrimary, lineWidth: 1)
+      HStack {
         Spacer()
-        Text(category.icon)
-          .font(.largeTitle)
-        Text(category.name)
-          .font(.caption)
+        VStack {
+          Spacer()
+          Text(category.icon)
+            .font(.largeTitle)
+          Text(category.name)
+            .font(.headline)
+            .foregroundColor(.onSurface)
+          Spacer()
+        }
         Spacer()
       }
-      Spacer()
-    }
-    .padding()
-    .overlay {
-      RoundedRectangle(cornerRadius: 16)
-        .stroke(Color.primary.opacity(0.1), lineWidth: 1)
+      .padding()
     }
   }
 }
 
 #Preview("CategoryTile") {
   CategoryTile(category: Category(id: 1, name: "Category 1", icon: "🍔"))
-    .frame(width: 100, height: 100)
+    .frame(width: 200, height: 200)
 }

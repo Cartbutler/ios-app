@@ -21,7 +21,7 @@
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Bcu-3y-fUS"/>
-                        <color key="backgroundColor" name="BackgroundColor"/>
+                        <color key="backgroundColor" name="Theme Primary"/>
                         <constraints>
                             <constraint firstItem="UJg-Op-IUr" firstAttribute="centerY" secondItem="Bcu-3y-fUS" secondAttribute="centerY" id="AeC-6H-THG"/>
                             <constraint firstItem="UJg-Op-IUr" firstAttribute="width" secondItem="Ze5-6b-2t3" secondAttribute="height" multiplier="1:3" id="rhr-9x-aKc"/>
@@ -36,8 +36,8 @@
     </scenes>
     <resources>
         <image name="ButlerNoBackground" width="1024" height="1024"/>
-        <namedColor name="BackgroundColor">
-            <color red="0.89824244470307324" green="0.88815938317323206" blue="0.81017945992826212" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+        <namedColor name="Theme Primary">
+            <color red="0.54117647058823526" green="0.81960784313725488" blue="0.40392156862745099" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>
