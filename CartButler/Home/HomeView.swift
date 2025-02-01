@@ -26,6 +26,9 @@ struct HomeView: View {
           }
         }
       }
+      .navigationTitle("CartButler")
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbarBackground(.themePrimary, for: .navigationBar)
     }
     .searchable(text: $viewModel.searchKey, prompt: "Search products")
     .searchSuggestions {
@@ -37,11 +40,13 @@ struct HomeView: View {
         }
       }
     }
+    .foregroundStyle(.onBackground)
+    .backgroundStyle(.themeBackground)
   }
   
   private var categoriesGrid: some View {
     ScrollView {
-      LazyVGrid(columns: [.init(.adaptive(minimum: 100))]) {
+      LazyVGrid(columns: [.init(.adaptive(minimum: 150))]) {
         ForEach(categories) { category in
           NavigationLink {
             CategoryTile(category: category)

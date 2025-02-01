@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Account" : {
+
+    },
     "Cart" : {
       "localizations" : {
         "pt-BR" : {
@@ -10,6 +13,9 @@
           }
         }
       }
+    },
+    "CartButler" : {
+
     },
     "Dairy" : {
       "extractionState" : "manual",
