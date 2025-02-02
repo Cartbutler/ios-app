@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		F03849DA2D4EF01200F8B0F3 /* Mockable in Frameworks */ = {isa = PBXBuildFile; productRef = F03849D92D4EF01200F8B0F3 /* Mockable */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		F0FD16832D3EA756009CF9A7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F03849DA2D4EF01200F8B0F3 /* Mockable in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,6 +108,7 @@
 			);
 			name = CartButler;
 			packageProductDependencies = (
+				F03849D92D4EF01200F8B0F3 /* Mockable */,
 			);
 			productName = CartButler;
 			productReference = F0FD166F2D3EA755009CF9A7 /* CartButler.app */;
@@ -160,6 +166,9 @@
 			);
 			mainGroup = F0FD16662D3EA755009CF9A7;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				F03849D82D4EF01200F8B0F3 /* XCRemoteSwiftPackageReference "Mockable" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F0FD16702D3EA755009CF9A7 /* Products */;
 			projectDirPath = "";
@@ -270,7 +279,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "MOCKING DEBUG $(inherited)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -491,6 +500,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F03849D82D4EF01200F8B0F3 /* XCRemoteSwiftPackageReference "Mockable" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Kolos65/Mockable.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.3.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F03849D92D4EF01200F8B0F3 /* Mockable */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F03849D82D4EF01200F8B0F3 /* XCRemoteSwiftPackageReference "Mockable" */;
+			productName = Mockable;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F0FD16672D3EA755009CF9A7 /* Project object */;
 }
