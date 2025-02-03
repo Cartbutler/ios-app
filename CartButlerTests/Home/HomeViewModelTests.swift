@@ -6,36 +6,37 @@
 //
 import SwiftData
 import Testing
+
 @testable import CartButler
 
 @MainActor
 struct HomeViewModelTests {
-  
+
   private let container: ModelContainer
   private let sut: HomeViewModel
-  
+
   init() async throws {
     container = try ModelContainer(
       for: Suggestion.self,
       configurations: .init(isStoredInMemoryOnly: true)
     )
-    
+
     let context = ModelContext(container)
     context.insert(
       Suggestion(id: 1, searchKey: "key", suggestions: ["result"])
     )
     try context.save()
-    
+
     sut = HomeViewModel(container: container)
   }
-  
+
   @Test func initialSuggestionsShouldBeEmpty() async throws {
     // Given
     #expect(sut.searchKey == "")
     // Then
     #expect(sut.suggestions == [])
   }
-  
+
   @Test func searchKeyShouldFetchItems() async throws {
     // Given
     #expect(sut.searchKey == "")
@@ -44,7 +45,7 @@ struct HomeViewModelTests {
     // Then
     #expect(sut.suggestions == ["result"])
   }
-  
+
   @Test func noSuggestionsFound() async throws {
     // Given
     sut.searchKey = "key"
@@ -54,7 +55,5 @@ struct HomeViewModelTests {
     // Then
     #expect(sut.suggestions == [])
   }
-  
+
 }
-
-

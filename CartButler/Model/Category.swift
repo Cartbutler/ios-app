@@ -12,7 +12,7 @@ final class Category {
   var id: Int
   var name: String
   var icon: String
-  
+
   init(id: Int, name: String, icon: String) {
     self.id = id
     self.name = name

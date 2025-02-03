@@ -31,7 +31,6 @@ struct MainView: View {
   MainView()
 }
 
-
 #Preview("pt-BR") {
   MainView()
     .environment(\.locale, .init(identifier: "pt-BR"))
