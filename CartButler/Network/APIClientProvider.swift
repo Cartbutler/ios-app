@@ -6,7 +6,7 @@
 //
 
 protocol APIClientProvider {
-  
+
   /// Performs a GET request
   /// - Parameters:
   ///   - path: The path to append to the base URL
@@ -18,7 +18,7 @@ protocol APIClientProvider {
     path: String,
     queryParameters: [String: String]?
   ) async throws -> T
-  
+
   /// Performs a POST request
   /// - Parameters:
   ///   - path: The path to append to the base URL
@@ -30,7 +30,7 @@ protocol APIClientProvider {
     path: String,
     body: U
   ) async throws -> T
-  
+
   /// Performs a POST request
   /// - Parameters:
   ///   - path: The path to append to the base URL
@@ -43,7 +43,7 @@ protocol APIClientProvider {
     path: String,
     body: U
   ) async throws
-  
+
   /// Performs a PUT request
   /// - Parameters:
   ///   - path: The path to append to the base URL
@@ -55,7 +55,7 @@ protocol APIClientProvider {
     path: String,
     body: U
   ) async throws -> T
-  
+
   /// Performs a PUT request
   /// - Parameters:
   ///   - path: The path to append to the base URL
@@ -68,7 +68,7 @@ protocol APIClientProvider {
     path: String,
     body: U
   ) async throws
-  
+
   /// Performs a DELETE request
   /// - Parameters:
   ///   - path: The path to append to the base URL
@@ -80,7 +80,7 @@ protocol APIClientProvider {
     path: String,
     queryParameters: [String: String]?
   ) async throws -> T
-  
+
   /// Performs a DELETE request without expecting a response
   /// - Parameters:
   ///   - path: The path to append to the base URL
@@ -95,7 +95,7 @@ protocol APIClientProvider {
 }
 
 extension APIClientProvider {
-  
+
   /// Performs a GET request
   /// - Parameters:
   ///   - path: The path to append to the base URL
@@ -107,7 +107,7 @@ extension APIClientProvider {
   ) async throws -> T {
     try await get(path: path, queryParameters: nil)
   }
-  
+
   /// Performs a DELETE request
   /// - Parameters:
   ///   - path: The path to append to the base URL
@@ -119,7 +119,7 @@ extension APIClientProvider {
   ) async throws -> T {
     try await delete(path: path, queryParameters: nil)
   }
-  
+
   /// Performs a DELETE request without expecting a response
   /// - Parameters:
   ///   - path: The path to append to the base URL

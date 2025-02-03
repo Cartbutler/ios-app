@@ -1,3 +1,4 @@
+import SwiftData
 //
 //  HomeView.swift
 //  CartButler
@@ -5,16 +6,15 @@
 //  Created by Cassiano Monteiro on 2025-01-23.
 //
 import SwiftUI
-import SwiftData
 
 struct HomeView: View {
   @State private var searchText = ""
-  
+
   @StateObject private var viewModel = HomeViewModel()
-  
+
   @Query(sort: \Category.name)
   private var categories: [Category]
-  
+
   var body: some View {
     NavigationStack {
       withAnimation {
@@ -43,7 +43,7 @@ struct HomeView: View {
     .foregroundStyle(.onBackground)
     .backgroundStyle(.themeBackground)
   }
-  
+
   private var categoriesGrid: some View {
     ScrollView {
       LazyVGrid(columns: [.init(.adaptive(minimum: 150))]) {
@@ -58,7 +58,7 @@ struct HomeView: View {
       .padding()
     }
   }
-  
+
   private var butlerImage: some View {
     GeometryReader { geometry in
       VStack(spacing: .zero) {
@@ -86,7 +86,6 @@ struct HomeView: View {
 #Preview("English") {
   HomeView()
 }
-
 
 #Preview("pt-BR") {
   HomeView()

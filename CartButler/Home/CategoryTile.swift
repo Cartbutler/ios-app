@@ -8,7 +8,7 @@ import SwiftUI
 
 struct CategoryTile: View {
   let category: Category
-  
+
   var body: some View {
     ZStack {
       RoundedRectangle(cornerRadius: 16)
