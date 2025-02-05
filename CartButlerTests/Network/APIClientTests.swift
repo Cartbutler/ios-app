@@ -40,7 +40,7 @@ struct APIClientTests {
 
   @Test
   func testGetRequestSuccess() async throws {
-    // Arrange
+    // Given
     let parameters = ["key1": "value 1"]
     let expectedURL = URL(string: "https://example.com/api/test?key1=value%201")!
     let expectedRequest = try buildURLRequest(url: expectedURL, method: "GET")
@@ -48,102 +48,102 @@ struct APIClientTests {
       .data(for: .value(expectedRequest))
       .willReturn(try buildSuccessResponse())
 
-    // Act
+    // When
     let response: MockCodable = try await sut.get(path: "/test", queryParameters: parameters)
 
-    // Assert
+    // Then
     #expect(response == successBody)
   }
 
   @Test
   func testPostRequestSuccess() async throws {
-    // Arrange
+    // Given
     let expectedRequest = try buildURLRequest(method: "POST", body: requestBody)
     given(mockSession)
       .data(for: .value(expectedRequest))
       .willReturn(try buildSuccessResponse())
 
-    // Act
+    // When
     let response: MockCodable = try await sut.post(path: "/test", body: requestBody)
 
-    // Assert
+    // Then
     #expect(response == successBody)
   }
 
   @Test
   func testEmptyResponsePostRequestSuccess() async throws {
-    // Arrange
+    // Given
     let expectedRequest = try buildURLRequest(method: "POST", body: requestBody)
     given(mockSession)
       .data(for: .value(expectedRequest))
       .willReturn(try buildEmptySuccessResponse())
 
-    // Act
+    // When
     try await sut.post(path: "/test", body: requestBody)
 
-    // Assert
+    // Then
     verify(mockSession)
       .data(for: .value(expectedRequest)).called(1)
   }
 
   @Test
   func testPutRequestSuccess() async throws {
-    // Arrange
+    // Given
     let expectedRequest = try buildURLRequest(method: "PUT", body: requestBody)
     given(mockSession)
       .data(for: .value(expectedRequest))
       .willReturn(try buildSuccessResponse())
 
-    // Act
+    // When
     let response: MockCodable = try await sut.put(path: "/test", body: requestBody)
 
-    // Assert
+    // Then
     #expect(response == successBody)
   }
 
   @Test
   func testEmptyResponsePutRequestSuccess() async throws {
-    // Arrange
+    // Given
     let expectedRequest = try buildURLRequest(method: "PUT", body: requestBody)
     given(mockSession)
       .data(for: .value(expectedRequest))
       .willReturn(try buildEmptySuccessResponse())
 
-    // Act
+    // When
     try await sut.put(path: "/test", body: requestBody)
 
-    // Assert
+    // Then
     verify(mockSession)
       .data(for: .value(expectedRequest)).called(1)
   }
 
   @Test
   func testDeleteRequestSuccess() async throws {
-    // Arrange
+    // Given
     let expectedRequest = try buildURLRequest(method: "DELETE")
     given(mockSession)
       .data(for: .value(expectedRequest))
       .willReturn(try buildSuccessResponse())
 
-    // Act
+    // When
     let response: MockCodable = try await sut.delete(path: "/test", queryParameters: nil)
 
-    // Assert
+    // Then
     #expect(response == successBody)
   }
 
   @Test
   func testEmptyResponseDeleteRequestSuccess() async throws {
-    // Arrange
+    // Given
     let expectedRequest = try buildURLRequest(method: "DELETE")
     given(mockSession)
       .data(for: .value(expectedRequest))
       .willReturn(try buildEmptySuccessResponse())
 
-    // Act
+    // When
     try await sut.delete(path: "/test", queryParameters: nil)
 
-    // Assert
+    // Then
     verify(mockSession)
       .data(for: .value(expectedRequest)).called(1)
   }
@@ -152,59 +152,59 @@ struct APIClientTests {
 
   @Test
   func testGetRequestInvalidURL() async throws {
-    // Arrange
+    // Given
     let invalidURL = URL(string: "invalid")!
     let sut = APIClient(baseURL: invalidURL, session: mockSession)
 
-    // Assert
+    // Then
     async #expect(
       performing: {
-        // Act
+        // When
         let _: MockCodable = try await sut.get(path: "//path")
       },
       throws: { error in
-        // Assert
+        // Then
         if case NetworkError.invalidURL = error { true } else { false }
       })
   }
 
   @Test
   func testGetRequestNetworkError() async throws {
-    // Arrange
+    // Given
     given(mockSession)
       .data(for: .any)
       .willThrow(NSError(domain: "test", code: 0, userInfo: nil))
 
     async #expect(
       performing: {
-        // Act
+        // When
         let _: MockCodable = try await sut.get(path: "/test")
       },
       throws: { error in
-        // Assert
+        // Then
         if case NetworkError.requestFailed = error { true } else { false }
       })
   }
 
   @Test
   func testPostEncodingError() async throws {
-    // Arrange
+    // Given
     let invalidBody = MockCodable(message: "message", number: .nan)
 
     async #expect(
       performing: {
-        // Act
+        // When
         let _: MockCodable = try await sut.post(path: "/test", body: invalidBody)
       },
       throws: { error in
-        // Assert
+        // Then
         if case NetworkError.encodingError = error { true } else { false }
       })
   }
 
   @Test
   func testPutRequestBadStatusCode() async throws {
-    // Arrange
+    // Given
     let errorResponse = "Bad Request"
     given(mockSession)
       .data(for: .any)
@@ -212,11 +212,11 @@ struct APIClientTests {
 
     async #expect(
       performing: {
-        // Act
+        // When
         let _: MockCodable = try await sut.put(path: "/test", body: requestBody)
       },
       throws: { error in
-        // Assert
+        // Then
         if case NetworkError.badStatusCode(let receivedError as NSError) = error {
           receivedError.code == 400
             && receivedError.userInfo["response"] as? String == errorResponse

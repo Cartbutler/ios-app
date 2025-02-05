@@ -4,8 +4,11 @@
 //
 //  Created by Cassiano Monteiro on 2025-02-01.
 //
+import Foundation
+import Mockable
 
-protocol APIClientProvider {
+@Mockable
+protocol APIClientProvider: Sendable {
 
   /// Performs a GET request
   /// - Parameters:
@@ -31,19 +34,6 @@ protocol APIClientProvider {
     body: U
   ) async throws -> T
 
-  /// Performs a POST request
-  /// - Parameters:
-  ///   - path: The path to append to the base URL
-  ///   - body: The request body
-  /// - Returns: The decoded response object
-  /// - Throws: An error if the request fails or the response cannot be decoded
-  /// - Note: The body parameter must conform to `Encodable`
-  /// - Note: This method is useful for requests that do not expect a response body
-  func post<U: Encodable>(
-    path: String,
-    body: U
-  ) async throws
-
   /// Performs a PUT request
   /// - Parameters:
   ///   - path: The path to append to the base URL
@@ -56,19 +46,6 @@ protocol APIClientProvider {
     body: U
   ) async throws -> T
 
-  /// Performs a PUT request
-  /// - Parameters:
-  ///   - path: The path to append to the base URL
-  ///   - body: The request body
-  /// - Returns: The decoded response object
-  /// - Throws: An error if the request fails or the response cannot be decoded
-  /// - Note: The body parameter must conform to `Encodable`
-  /// - Note: This method is useful for requests that do not expect a response body
-  func put<U: Encodable>(
-    path: String,
-    body: U
-  ) async throws
-
   /// Performs a DELETE request
   /// - Parameters:
   ///   - path: The path to append to the base URL
@@ -80,18 +57,6 @@ protocol APIClientProvider {
     path: String,
     queryParameters: [String: String]?
   ) async throws -> T
-
-  /// Performs a DELETE request without expecting a response
-  /// - Parameters:
-  ///   - path: The path to append to the base URL
-  ///   - queryParameters: Optional query parameters
-  /// - Throws: An error if the request fails
-  /// - Note: The queryParameters parameter is a dictionary of key-value pairs that will be appended to the URL as query parameters
-  /// - Note: This method is useful for delete requests that do not return a response body
-  func delete(
-    path: String,
-    queryParameters: [String: String]?
-  ) async throws
 }
 
 extension APIClientProvider {
@@ -108,6 +73,23 @@ extension APIClientProvider {
     try await get(path: path, queryParameters: nil)
   }
 
+  /// Performs a POST request
+  /// - Parameters:
+  ///   - path: The path to append to the base URL
+  ///   - body: The request body
+  /// - Returns: The decoded response object
+  /// - Throws: An error if the request fails or the response cannot be decoded
+  /// - Note: The body parameter must conform to `Encodable`
+  /// - Note: This method is useful for requests that do not expect a response body
+  func post<U: Encodable>(
+    path: String,
+    body: U
+  ) async throws {
+    try await executeWithEmptyResponse {
+      try await post(path: path, body: body)
+    }
+  }
+
   /// Performs a DELETE request
   /// - Parameters:
   ///   - path: The path to append to the base URL
@@ -118,6 +100,23 @@ extension APIClientProvider {
     path: String
   ) async throws -> T {
     try await delete(path: path, queryParameters: nil)
+  }
+
+  /// Performs a PUT request
+  /// - Parameters:
+  ///   - path: The path to append to the base URL
+  ///   - body: The request body
+  /// - Returns: The decoded response object
+  /// - Throws: An error if the request fails or the response cannot be decoded
+  /// - Note: The body parameter must conform to `Encodable`
+  /// - Note: This method is useful for requests that do not expect a response body
+  func put<U: Encodable>(
+    path: String,
+    body: U
+  ) async throws {
+    try await executeWithEmptyResponse {
+      try await put(path: path, body: body)
+    }
   }
 
   /// Performs a DELETE request without expecting a response
@@ -131,4 +130,33 @@ extension APIClientProvider {
   ) async throws {
     try await delete(path: path, queryParameters: nil)
   }
+
+  /// Performs a DELETE request without expecting a response
+  /// - Parameters:
+  ///   - path: The path to append to the base URL
+  ///   - queryParameters: Optional query parameters
+  /// - Throws: An error if the request fails
+  /// - Note: The queryParameters parameter is a dictionary of key-value pairs that will be appended to the URL as query parameters
+  /// - Note: This method is useful for delete requests that do not return a response body
+  func delete(
+    path: String,
+    queryParameters: [String: String]?
+  ) async throws {
+    try await executeWithEmptyResponse {
+      try await delete(path: path, queryParameters: queryParameters)
+    }
+  }
+
+  private func executeWithEmptyResponse(request: () async throws -> EmptyResponse) async throws {
+    do {
+      _ = try await request()
+    } catch NetworkError.decodingError {
+      // Ignore decoding error for empty response
+    } catch {
+      throw error
+    }
+  }
 }
+
+// Empty type for requests without response
+private struct EmptyResponse: Codable {}

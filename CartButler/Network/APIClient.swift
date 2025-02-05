@@ -31,12 +31,12 @@ private enum HTTPMethod: String {
   case delete = "DELETE"
 }
 
-final class APIClient: APIClientProvider, Sendable {
+final class APIClient: APIClientProvider {
 
   static let shared = APIClient()
 
   static private let defaulURL = URL(
-    string: "https://southern-shard-449119-d4.nn.r.appspot.com/api")!
+    string: "https://southern-shard-449119-d4.nn.r.appspot.com")!
 
   private let baseURL: URL
   private let session: NetworkSession
@@ -62,13 +62,6 @@ final class APIClient: APIClientProvider, Sendable {
     try await performRequest(path: path, method: .post, body: body)
   }
 
-  func post<U: Encodable>(
-    path: String,
-    body: U
-  ) async throws {
-    try await performEmptyResponseRequest(path: path, method: .post, body: body)
-  }
-
   func put<T: Decodable, U: Encodable>(
     path: String,
     body: U
@@ -76,26 +69,11 @@ final class APIClient: APIClientProvider, Sendable {
     try await performRequest(path: path, method: .put, body: body)
   }
 
-  func put<U: Encodable>(
-    path: String,
-    body: U
-  ) async throws {
-    try await performEmptyResponseRequest(path: path, method: .put, body: body)
-  }
-
   func delete<T: Decodable>(
     path: String,
     queryParameters: [String: String]? = nil
   ) async throws -> T {
     try await performRequest(path: path, method: .delete, queryParameters: queryParameters)
-  }
-
-  func delete(
-    path: String,
-    queryParameters: [String: String]? = nil
-  ) async throws {
-    try await performEmptyResponseRequest(
-      path: path, method: .delete, queryParameters: queryParameters)
   }
 
   // MARK: - Generic Request Method
@@ -158,23 +136,4 @@ final class APIClient: APIClientProvider, Sendable {
       throw NetworkError.decodingError(error)
     }
   }
-
-  private func performEmptyResponseRequest(
-    path: String,
-    method: HTTPMethod,
-    queryParameters: [String: String]? = nil,
-    body: Encodable? = nil
-  ) async throws {
-    do {
-      let _: EmptyResponse = try await performRequest(
-        path: path, method: method, queryParameters: queryParameters, body: body)
-    } catch NetworkError.decodingError {
-      // Ignore decoding error for empty response
-    } catch {
-      throw error
-    }
-  }
-
-  // Empty type for requests without response
-  private struct EmptyResponse: Codable {}
 }
