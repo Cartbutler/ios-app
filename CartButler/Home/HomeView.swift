@@ -42,6 +42,9 @@ struct HomeView: View {
     }
     .foregroundStyle(.onBackground)
     .backgroundStyle(.themeBackground)
+    .task {
+      viewModel.fetchCategories()
+    }
   }
 
   private var categoriesGrid: some View {

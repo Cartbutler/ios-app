@@ -12,8 +12,20 @@ import SwiftUI
 struct CartButlerApp: App {
   var body: some Scene {
     WindowGroup {
-      MainView()
+      if !isRunningTests {
+        MainView()
+      } else {
+        EmptyView()
+      }
     }
     .modelContainer(MainContainer.shared)
+  }
+
+  private var isRunningTests: Bool {
+    #if DEBUG
+      ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+    #else
+      false
+    #endif
   }
 }
