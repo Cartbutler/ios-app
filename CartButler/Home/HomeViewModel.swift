@@ -11,9 +11,14 @@ import SwiftUI
 @MainActor
 final class HomeViewModel: ObservableObject {
 
+  private let categoryRepository: CategoryRepository
   private let container: ModelContainer
 
-  init(container: ModelContainer = MainContainer.shared) {
+  init(
+    categoryRepository: CategoryRepository = CategoryRepositoryImpl(),
+    container: ModelContainer = MainContainer.shared
+  ) {
+    self.categoryRepository = categoryRepository
     self.container = container
   }
 
@@ -24,6 +29,12 @@ final class HomeViewModel: ObservableObject {
   }
 
   @Published private(set) var suggestions: [String] = []
+
+  func fetchCategories() {
+    Task {
+      try? await categoryRepository.fetchAll()
+    }
+  }
 
   func fetchItems() {
     let filterKey = searchKey.trimmingCharacters(in: .whitespaces).lowercased()
