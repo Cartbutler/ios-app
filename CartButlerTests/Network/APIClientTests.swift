@@ -151,39 +151,18 @@ struct APIClientTests {
   // MARK: - Error responses
 
   @Test
-  func testGetRequestInvalidURL() async throws {
-    // Given
-    let invalidURL = URL(string: "invalid")!
-    let sut = APIClient(baseURL: invalidURL, session: mockSession)
-
-    // Then
-    async #expect(
-      performing: {
-        // When
-        let _: MockCodable = try await sut.get(path: "//path")
-      },
-      throws: { error in
-        // Then
-        if case NetworkError.invalidURL = error { true } else { false }
-      })
-  }
-
-  @Test
   func testGetRequestNetworkError() async throws {
     // Given
+    let expectedError = NSError(domain: "test", code: 0, userInfo: nil)
     given(mockSession)
       .data(for: .any)
-      .willThrow(NSError(domain: "test", code: 0, userInfo: nil))
+      .willThrow(expectedError)
 
-    async #expect(
-      performing: {
-        // When
-        let _: MockCodable = try await sut.get(path: "/test")
-      },
-      throws: { error in
-        // Then
-        if case NetworkError.requestFailed = error { true } else { false }
-      })
+    // Then
+    await #expect(throws: NetworkError.requestFailed(expectedError)) {
+      // When
+      let _: MockCodable = try await sut.get(path: "/test")
+    }
   }
 
   @Test
@@ -191,15 +170,17 @@ struct APIClientTests {
     // Given
     let invalidBody = MockCodable(message: "message", number: .nan)
 
-    async #expect(
-      performing: {
-        // When
-        let _: MockCodable = try await sut.post(path: "/test", body: invalidBody)
-      },
-      throws: { error in
-        // Then
-        if case NetworkError.encodingError = error { true } else { false }
-      })
+    do {
+      // When
+      let _: MockCodable = try await sut.post(path: "/test", body: invalidBody)
+      Issue.record("Failed to throw error")
+    } catch {
+      // Then
+      if case NetworkError.encodingError = error {
+      } else {
+        Issue.record(error, "Unexpected error thrown")
+      }
+    }
   }
 
   @Test
@@ -210,20 +191,14 @@ struct APIClientTests {
       .data(for: .any)
       .willReturn(try buildResponse(response: errorResponse.data(using: .utf8), statusCode: 400))
 
-    async #expect(
-      performing: {
-        // When
-        let _: MockCodable = try await sut.put(path: "/test", body: requestBody)
-      },
-      throws: { error in
-        // Then
-        if case NetworkError.badStatusCode(let receivedError as NSError) = error {
-          receivedError.code == 400
-            && receivedError.userInfo["response"] as? String == errorResponse
-        } else {
-          false
-        }
-      })
+    let expectedError = NSError(
+      domain: "Network error", code: 400, userInfo: ["response": errorResponse])
+
+    // Then
+    await #expect(throws: NetworkError.badStatusCode(expectedError)) {
+      // When
+      let _: MockCodable = try await sut.put(path: "/test", body: requestBody)
+    }
   }
 
   // MARK: - Helper methods

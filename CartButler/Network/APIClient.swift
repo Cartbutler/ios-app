@@ -15,13 +15,28 @@ protocol NetworkSession: Sendable {
 
 extension URLSession: NetworkSession {}
 
-enum NetworkError: Error {
+enum NetworkError: Error, Equatable {
   case invalidURL
   case invalidResponse
   case requestFailed(Error)
   case badStatusCode(Error)
   case decodingError(Error)
   case encodingError(Error)
+
+  static func == (lhs: NetworkError, rhs: NetworkError) -> Bool {
+    switch (lhs, rhs) {
+    case (.invalidURL, .invalidURL),
+      (.invalidResponse, .invalidResponse):
+      true
+    case (.requestFailed(let lhs), .requestFailed(let rhs)),
+      (.badStatusCode(let lhs), .badStatusCode(let rhs)),
+      (.decodingError(let lhs), .decodingError(let rhs)),
+      (.encodingError(let lhs), .encodingError(let rhs)):
+      lhs as NSError == rhs as NSError
+    default:
+      false
+    }
+  }
 }
 
 private enum HTTPMethod: String {
@@ -105,7 +120,9 @@ final class APIClient: APIClientProvider {
 
     if let body = body {
       do {
-        request.httpBody = try JSONEncoder().encode(body)
+        let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
+        request.httpBody = try encoder.encode(body)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
       } catch {
         throw NetworkError.encodingError(error)
