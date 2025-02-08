@@ -6,7 +6,9 @@
 //
 
 import Foundation
+import Mockable
 
+@Mockable
 protocol APIServiceProvider: Sendable {
   func fetchCategories() async throws -> [CategoryDTO]
 }

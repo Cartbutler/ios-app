@@ -11,6 +11,12 @@ protocol DataPreloader: PersistentModel {
   static var defaults: [Self] { get }
 }
 
+extension ModelContainer {
+  func newBackgroundContext() -> ModelContext {
+    ModelContext(self)
+  }
+}
+
 actor MainContainer {
 
   @MainActor
@@ -27,7 +33,6 @@ actor MainContainer {
 
   @MainActor
   static private func preLoadData(container: ModelContainer) {
-    preloadData(Category.self, container: container)
     preloadData(Suggestion.self, container: container)
   }
 
