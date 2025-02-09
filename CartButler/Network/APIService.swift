@@ -1,5 +1,5 @@
 //
-//  ApiService.swift
+//  APIService.swift
 //  CartButler
 //
 //  Created by Cassiano Monteiro on 2025-02-05.
@@ -11,6 +11,7 @@ import Mockable
 @Mockable
 protocol APIServiceProvider: Sendable {
   func fetchCategories() async throws -> [CategoryDTO]
+  func fetchSuggestions(query: String) async throws -> [SuggestionDTO]
 }
 
 final class APIService: APIServiceProvider {
@@ -22,5 +23,9 @@ final class APIService: APIServiceProvider {
 
   func fetchCategories() async throws -> [CategoryDTO] {
     try await apiClient.get(path: "categories")
+  }
+
+  func fetchSuggestions(query: String) async throws -> [SuggestionDTO] {
+    try await apiClient.get(path: "suggestions", queryParameters: ["query": query])
   }
 }
