@@ -40,16 +40,9 @@ struct CategoryRepositoryTests {
     let count = try mockContainer.mainContext.fetchCount(fetchDescriptor)
     try #require(count == 0)
 
-    try await confirmation { contextSaved in
-      NotificationCenter.default.addObserver(
-        forName: .NSManagedObjectContextDidSave,
-        object: nil,
-        queue: nil,
-        using: { _ in contextSaved() }
-      )
-      // When
+    // When
+    try await forContextSavedConfirmation {
       try await sut.fetchAll()
-      try await Task.sleep(for: .seconds(0.1))
     }
 
     // Then
