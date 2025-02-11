@@ -14,10 +14,12 @@ import Testing
 struct APIClientTests {
 
   private struct MockCodable: Codable, Equatable {
+    let messageId: Int
     let message: String
     let number: Double?
 
     init(message: String, number: Double? = nil) {
+      self.messageId = 1
       self.message = message
       self.number = number
     }
@@ -26,8 +28,10 @@ struct APIClientTests {
   private let mockSession = MockNetworkSession()
   private let sut: APIClient
   private let mockEndpointURL = URL(string: "https://example.com/api/test")!
-  private let requestBody = MockCodable(message: "Request")
-  private let successBody = MockCodable(message: "Success")
+  //  private let requestBody = MockCodable(message: "Request")
+  //  private let successBody = MockCodable(message: "Success")
+  private let requestBody = "{ \"message_id\": 1, \"message\": \"request\" }"
+  private let successBody = "{ \"message_id\": 1, \"message\": \"success\" }"
 
   init() {
     sut = APIClient(
@@ -52,7 +56,7 @@ struct APIClientTests {
     let response: MockCodable = try await sut.get(path: "/test", queryParameters: parameters)
 
     // Then
-    #expect(response == successBody)
+    #expect(response.message == "success")
   }
 
   @Test
@@ -67,7 +71,7 @@ struct APIClientTests {
     let response: MockCodable = try await sut.post(path: "/test", body: requestBody)
 
     // Then
-    #expect(response == successBody)
+    #expect(response.message == "success")
   }
 
   @Test
@@ -98,7 +102,7 @@ struct APIClientTests {
     let response: MockCodable = try await sut.put(path: "/test", body: requestBody)
 
     // Then
-    #expect(response == successBody)
+    #expect(response.message == "success")
   }
 
   @Test
@@ -129,7 +133,7 @@ struct APIClientTests {
     let response: MockCodable = try await sut.delete(path: "/test", queryParameters: nil)
 
     // Then
-    #expect(response == successBody)
+    #expect(response.message == "success")
   }
 
   @Test
@@ -189,7 +193,7 @@ struct APIClientTests {
     let errorResponse = "Bad Request"
     given(mockSession)
       .data(for: .any)
-      .willReturn(try buildResponse(response: errorResponse.data(using: .utf8), statusCode: 400))
+      .willReturn(try buildResponse(response: errorResponse, statusCode: 400))
 
     let expectedError = NSError(
       domain: "Network error", code: 400, userInfo: ["response": errorResponse])
@@ -206,12 +210,12 @@ struct APIClientTests {
   private func buildURLRequest(
     url: URL? = nil,
     method: String,
-    body: MockCodable? = nil
+    body: String? = nil
   ) throws -> URLRequest {
     var request = URLRequest(url: url ?? mockEndpointURL)
     request.httpMethod = method
-    try body.flatMap {
-      request.httpBody = try JSONEncoder().encode($0)
+    body.flatMap {
+      request.httpBody = $0.data(using: .utf8)
       request.setValue("application/json", forHTTPHeaderField: "Content-Type")
     }
     return request
@@ -222,16 +226,17 @@ struct APIClientTests {
   }
 
   private func buildEmptySuccessResponse() throws -> (Data, URLResponse) {
-    try buildResponse(response: Data())
+    try buildResponse(response: "")
   }
 
   private func buildResponse(
     expectedURL: URL? = nil,
-    response: Data? = nil,
+    response: String? = nil,
     statusCode: Int? = nil
   ) throws -> (Data, URLResponse) {
-    (
-      try response ?? JSONEncoder().encode(self.successBody),
+    let body = try #require((response ?? self.successBody).data(using: .utf8))
+    return (
+      body,
       HTTPURLResponse(
         url: expectedURL ?? self.mockEndpointURL,
         statusCode: statusCode ?? 200,
