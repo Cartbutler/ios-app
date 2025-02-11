@@ -27,13 +27,11 @@ actor MainContainer {
     let schema = Schema([Category.self, Suggestion.self])
     let modelConfiguration = ModelConfiguration(schema: schema)
     let container = try! ModelContainer(for: schema, configurations: [modelConfiguration])
-    preLoadData(container: container)
     return container
   }
 
   @MainActor
   static private func preLoadData(container: ModelContainer) {
-    preloadData(Suggestion.self, container: container)
   }
 
   @MainActor

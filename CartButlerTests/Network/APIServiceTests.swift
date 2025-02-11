@@ -20,6 +20,8 @@ struct APIServiceTests {
     sut = APIService(apiClient: mockAPIClient)
   }
 
+  // MARK: - Categories
+
   @Test
   func fetchCategoriesSuccess() async throws {
     // Given
@@ -46,6 +48,37 @@ struct APIServiceTests {
 
     await #expect(throws: NetworkError.invalidResponse) {
       _ = try await sut.fetchCategories()
+    }
+  }
+
+  // MARK: - Suggestions
+
+  @Test
+  func fetchSuggestionsSuccess() async throws {
+    // Given
+    let expectedResponse = [SuggestionDTO(id: 1, name: "suggestion", priority: 1)]
+    given(mockAPIClient)
+      .get(path: .value("suggestions"), queryParameters: .value(["query": "my query"]))
+      .willReturn(expectedResponse)
+
+    // When
+    let result = try await sut.fetchSuggestions(query: "my query")
+
+    // Then
+    #expect(result == expectedResponse)
+  }
+
+  @Test
+  func fetchSuggestionsFailure() async throws {
+    // Given
+    given(mockAPIClient)
+      .get(path: .any, queryParameters: .any)
+      .willProduce { _, _ -> [SuggestionDTO] in
+        throw NetworkError.invalidResponse
+      }
+
+    await #expect(throws: NetworkError.invalidResponse) {
+      _ = try await sut.fetchSuggestions(query: "my query")
     }
   }
 }

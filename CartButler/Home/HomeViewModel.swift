@@ -12,41 +12,44 @@ import SwiftUI
 final class HomeViewModel: ObservableObject {
 
   private let categoryRepository: CategoryRepository
-  private let container: ModelContainer
-
-  init(
-    categoryRepository: CategoryRepository = CategoryRepositoryImpl(),
-    container: ModelContainer = MainContainer.shared
-  ) {
-    self.categoryRepository = categoryRepository
-    self.container = container
-  }
+  private let suggestionRepository: SuggestionRepository
 
   @Published var searchKey = "" {
     didSet {
-      fetchItems()
+      query = searchKey.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+    }
+  }
+  @Published private(set) var query = "" {
+    didSet {
+      fetchSuggestions()
     }
   }
 
-  @Published private(set) var suggestions: [String] = []
+  init(
+    categoryRepository: CategoryRepository = CategoryRepositoryImpl(),
+    suggestionRepository: SuggestionRepository = SuggestionRepositoryImpl()
+  ) {
+    self.categoryRepository = categoryRepository
+    self.suggestionRepository = suggestionRepository
+  }
 
   func fetchCategories() {
     Task {
-      try? await categoryRepository.fetchAll()
+      do {
+        try await categoryRepository.fetchAll()
+      } catch {
+        print("Failed to fetch categories: \(error)")
+      }
     }
   }
 
-  func fetchItems() {
-    let filterKey = searchKey.trimmingCharacters(in: .whitespaces).lowercased()
-    var descriptor = FetchDescriptor<Suggestion>(
-      predicate: #Predicate { $0.searchKey == filterKey }
-    )
-    descriptor.fetchLimit = 1
-
-    if let result = try? container.mainContext.fetch(descriptor).first {
-      suggestions = result.suggestions
-    } else {
-      suggestions = []
+  private func fetchSuggestions() {
+    Task {
+      do {
+        try await suggestionRepository.fetchSuggestions(query: query)
+      } catch {
+        print("Failed to fetch suggestions: \(error)")
+      }
     }
   }
 }

@@ -4,6 +4,7 @@
 //
 //  Created by Cassiano Monteiro on 2025-01-26.
 //
+import Mockable
 import SwiftData
 import Testing
 
@@ -12,48 +13,82 @@ import Testing
 @MainActor
 struct HomeViewModelTests {
 
-  private let container: ModelContainer
+  private let mockCategoryRepository = MockCategoryRepository()
+  private let mockSuggestionRepository = MockSuggestionRepository()
   private let sut: HomeViewModel
 
   init() async throws {
-    container = try ModelContainer(
-      for: Suggestion.self,
-      configurations: .init(isStoredInMemoryOnly: true)
+    sut = HomeViewModel(
+      categoryRepository: mockCategoryRepository,
+      suggestionRepository: mockSuggestionRepository
     )
 
-    let context = ModelContext(container)
-    context.insert(
-      Suggestion(id: 1, searchKey: "key", suggestions: ["result"])
-    )
-    try context.save()
-
-    sut = HomeViewModel(container: container)
+    given(mockCategoryRepository)
+      .fetchAll()
+      .willReturn()
+    given(mockSuggestionRepository)
+      .fetchSuggestions(query: .any)
+      .willReturn()
   }
 
-  @Test func initialSuggestionsShouldBeEmpty() async throws {
+  // MARK: - Categories
+
+  @Test
+  func fetchCategoriesShouldCallRepository() async {
+    // When
+    sut.fetchCategories()
+
+    // Then
+    await verify(mockCategoryRepository)
+      .fetchAll()
+      .calledEventually(1)
+  }
+
+  @Test
+  func fetchCategoriesFailureShouldNotThrow() async {
+    // Given
+    let error = NetworkError.invalidResponse
+    given(mockCategoryRepository)
+      .fetchAll()
+      .willThrow(error)
+
+    // Then
+    #expect(throws: Never.self) {
+      // When
+      sut.fetchCategories()
+    }
+  }
+
+  // MARK: - Suggestions
+
+  @Test func searchKeyShouldFetchSuggestions() async throws {
     // Given
     #expect(sut.searchKey == "")
+    #expect(sut.query == "")
+
+    // When
+    sut.searchKey = " Some key "
+
     // Then
-    #expect(sut.suggestions == [])
+    #expect(sut.query == "some key")
+    await verify(mockSuggestionRepository)
+      .fetchSuggestions(query: .value("some key"))
+      .calledEventually(1)
   }
 
-  @Test func searchKeyShouldFetchItems() async throws {
+  @Test
+  func suggestionsFailureShouldNotThrow() async {
     // Given
-    #expect(sut.searchKey == "")
-    // When
-    sut.searchKey = "key"
-    // Then
-    #expect(sut.suggestions == ["result"])
-  }
+    let error = NetworkError.invalidResponse
+    given(mockSuggestionRepository)
+      .fetchSuggestions(query: .any)
+      .willThrow(error)
 
-  @Test func noSuggestionsFound() async throws {
-    // Given
-    sut.searchKey = "key"
-    #expect(sut.suggestions.count == 1)
-    // When
-    sut.searchKey = "unknown"
     // Then
-    #expect(sut.suggestions == [])
+    #expect(throws: Never.self) {
+      // When
+      sut.searchKey = "key"
+    }
   }
 
 }

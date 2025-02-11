@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Mockable
 import SwiftData
 
 struct CategoryDTO: Decodable, Equatable {
@@ -13,6 +14,7 @@ struct CategoryDTO: Decodable, Equatable {
   let categoryName: String
 }
 
+@Mockable
 protocol CategoryRepository: Sendable {
   func fetchAll() async throws
 }
