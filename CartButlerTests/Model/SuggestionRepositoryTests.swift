@@ -1,8 +1,8 @@
 //
-//  CategoryRepositoryTests.swift
+//  SuggestionRepositoryTests.swift
 //  CartButler
 //
-//  Created by Cassiano Monteiro on 2025-02-07.
+//  Created by Cassiano Monteiro on 2025-02-10.
 //
 
 import Foundation
@@ -13,33 +13,33 @@ import Testing
 @testable import CartButler
 
 @MainActor
-struct CategoryRepositoryTests {
-
+struct SuggestionRepositoryTests {
+  
   private let mockAPIService = MockAPIServiceProvider()
   private let mockContainer: ModelContainer
-  private let sut: CategoryRepositoryImpl
-
+  private let sut: SuggestionRepositoryImpl
+  
   init() {
-    let configuration = ModelConfiguration(for: Category.self, isStoredInMemoryOnly: true)
-    mockContainer = try! ModelContainer(for: Category.self, configurations: configuration)
-
-    sut = CategoryRepositoryImpl(
+    let configuration = ModelConfiguration(for: SuggestionSet.self, isStoredInMemoryOnly: true)
+    mockContainer = try! ModelContainer(for: SuggestionSet.self, configurations: configuration)
+    sut = SuggestionRepositoryImpl(
       apiService: mockAPIService,
       container: mockContainer
     )
   }
-
+  
   @Test
-  func fetchCategoriesSuccess() async throws {
+  func fetchSuggestionsSuccess() async throws {
     // Given
-    let expectedResponse = [CategoryDTO(categoryId: 1, categoryName: "category")]
+    let expectedResponse = [SuggestionDTO(id: 1, name: "suggestion", priority: 1)]
     given(mockAPIService)
-      .fetchCategories()
+      .fetchSuggestions(query: .value("query"))
       .willReturn(expectedResponse)
-    let fetchDescriptor = FetchDescriptor<CartButler.Category>()
+    
+    let fetchDescriptor = FetchDescriptor<SuggestionSet>()
     let count = try mockContainer.mainContext.fetchCount(fetchDescriptor)
     try #require(count == 0)
-
+    
     try await confirmation { contextSaved in
       NotificationCenter.default.addObserver(
         forName: .NSManagedObjectContextDidSave,
@@ -48,28 +48,30 @@ struct CategoryRepositoryTests {
         using: { _ in contextSaved() }
       )
       // When
-      try await sut.fetchAll()
+      try await sut.fetchSuggestions(query: "query")
       try await Task.sleep(for: .seconds(0.1))
     }
-
-    // Then
+    
+    // When
     let results = try mockContainer.mainContext.fetch(fetchDescriptor)
     #expect(results.count == 1)
-    #expect(results.first?.id == 1)
-    #expect(results.first?.name == "category")
+    #expect(results.first?.query == "query")
+    #expect(results.first?.suggestions.count == 1)
+    #expect(results.first?.suggestions.first?.name == "suggestion")
+    #expect(results.first?.suggestions.first?.priority == 1)
   }
-
+  
   @Test
-  func fetchCategoriesFailure() async throws {
+  func fetchSuggestionsFailure() async throws {
     // Given
     given(mockAPIService)
-      .fetchCategories()
+      .fetchSuggestions(query: .any)
       .willThrow(NetworkError.invalidResponse)
-
+    
     // Then
     await #expect(throws: NetworkError.invalidResponse) {
       // When
-      try await sut.fetchAll()
+      try await sut.fetchSuggestions(query: "query")
     }
   }
 }
