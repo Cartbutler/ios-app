@@ -8,9 +8,8 @@ import SwiftData
 import SwiftUI
 
 struct HomeView: View {
-  @State private var searchText = ""
-
   @StateObject private var viewModel = HomeViewModel()
+  @State private var searchKey = ""
 
   @Query(sort: \Category.name)
   private var categories: [Category]
@@ -32,13 +31,7 @@ struct HomeView: View {
     }
     .searchable(text: $viewModel.searchKey, prompt: "Search products")
     .searchSuggestions {
-      ForEach(viewModel.suggestions, id: \.self) { suggestion in
-        NavigationLink {
-          Text(suggestion)
-        } label: {
-          Text(suggestion)
-        }
-      }
+      SuggestionsView(query: viewModel.query)
     }
     .foregroundStyle(.onBackground)
     .backgroundStyle(.themeBackground)
@@ -81,6 +74,28 @@ struct HomeView: View {
           Spacer()
         }
         Spacer()
+      }
+    }
+  }
+}
+
+struct SuggestionsView: View {
+  @Query
+  private var suggestions: [Suggestion]
+
+  init(query: String) {
+    _suggestions = Query(
+      filter: #Predicate { $0.suggestionSet.query == query },
+      sort: [.init(\.priority)]
+    )
+  }
+
+  var body: some View {
+    ForEach(suggestions) { suggestion in
+      NavigationLink {
+        Text(suggestion.name)
+      } label: {
+        Text(suggestion.name)
       }
     }
   }

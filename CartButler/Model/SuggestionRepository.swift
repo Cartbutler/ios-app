@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Mockable
 import SwiftData
 import SwiftUI
 
@@ -15,6 +16,7 @@ struct SuggestionDTO: Decodable, Equatable {
   let priority: Int
 }
 
+@Mockable
 protocol SuggestionRepository: Sendable {
   func fetchSuggestions(query: String) async throws
 }
