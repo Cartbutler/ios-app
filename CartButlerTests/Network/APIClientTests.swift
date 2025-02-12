@@ -17,11 +17,13 @@ struct APIClientTests {
     let messageId: Int
     let message: String
     let number: Double?
+    let date: Date
 
     init(message: String, number: Double? = nil) {
       self.messageId = 1
       self.message = message
       self.number = number
+      self.date = Date()
     }
   }
 
@@ -31,7 +33,14 @@ struct APIClientTests {
   //  private let requestBody = MockCodable(message: "Request")
   //  private let successBody = MockCodable(message: "Success")
   private let requestBody = "{ \"message_id\": 1, \"message\": \"request\" }"
-  private let successBody = "{ \"message_id\": 1, \"message\": \"success\" }"
+  private let successBody =
+    """
+    {
+      \"message_id\": 1, 
+      \"message\": \"success\" , 
+      \"date\": \"2025-02-11T23:57:56.000Z\"
+    }
+    """
 
   init() {
     sut = APIClient(

@@ -15,6 +15,9 @@ struct APIServiceTests {
 
   private let mockAPIClient = MockAPIClientProvider()
   private let sut: APIService
+  private let productDTO = ProductDTO(
+    productId: 1, productName: "product", description: "description", price: 4.99, stock: 10,
+    categoryId: 1, imagePath: "", createdAt: Date())
 
   init() {
     sut = APIService(apiClient: mockAPIClient)
@@ -46,7 +49,9 @@ struct APIServiceTests {
         throw NetworkError.invalidResponse
       }
 
+    // Then
     await #expect(throws: NetworkError.invalidResponse) {
+      // When
       _ = try await sut.fetchCategories()
     }
   }
@@ -77,8 +82,76 @@ struct APIServiceTests {
         throw NetworkError.invalidResponse
       }
 
+    // Then
     await #expect(throws: NetworkError.invalidResponse) {
+      // When
       _ = try await sut.fetchSuggestions(query: "my query")
+    }
+  }
+
+  // MARK: - Products by query
+
+  @Test
+  func fetchProductsByQuerySuccess() async throws {
+    // Given
+    let expectedResponse = [productDTO]
+    given(mockAPIClient)
+      .get(path: .value("search"), queryParameters: .value(["query": "a"]))
+      .willReturn(expectedResponse)
+
+    // When
+    let result = try await sut.fetchProducts(query: "a")
+
+    // Then
+    #expect(result == expectedResponse)
+  }
+
+  @Test
+  func fetchProductsByQueryFailure() async throws {
+    // Given
+    given(mockAPIClient)
+      .get(path: .any, queryParameters: .any)
+      .willProduce { _, _ -> [ProductDTO] in
+        throw NetworkError.invalidResponse
+      }
+
+    // Then
+    await #expect(throws: NetworkError.invalidResponse) {
+      // When
+      _ = try await sut.fetchProducts(query: "a")
+    }
+  }
+
+  // MARK: - Product by categoryID
+
+  @Test
+  func fetchProducstByCategorySuccess() async throws {
+    // Given
+    let expectedResponse = [productDTO]
+    given(mockAPIClient)
+      .get(path: .value("search"), queryParameters: .value(["categoryID": "1"]))
+      .willReturn(expectedResponse)
+
+    // When
+    let result = try await sut.fetchProducts(categoryID: 1)
+
+    // Then
+    #expect(result == expectedResponse)
+  }
+
+  @Test
+  func fetchProductsByCategoryFailure() async throws {
+    // Given
+    given(mockAPIClient)
+      .get(path: .any, queryParameters: .any)
+      .willProduce { _, _ -> [ProductDTO] in
+        throw NetworkError.invalidResponse
+      }
+
+    // Then
+    await #expect(throws: NetworkError.invalidResponse) {
+      // When
+      _ = try await sut.fetchProducts(categoryID: 1)
     }
   }
 }

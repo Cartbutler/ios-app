@@ -55,10 +55,24 @@ final class APIClient: APIClientProvider {
 
   private let baseURL: URL
   private let session: NetworkSession
+  private let decoder: JSONDecoder
+  private let encoder: JSONEncoder
 
   init(baseURL: URL = APIClient.defaulURL, session: NetworkSession = URLSession.shared) {
     self.baseURL = baseURL
     self.session = session
+
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+    dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+    dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+
+    decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    decoder.dateDecodingStrategy = .formatted(dateFormatter)
+    encoder = JSONEncoder()
+    encoder.keyEncodingStrategy = .convertToSnakeCase
+    encoder.dateEncodingStrategy = .formatted(dateFormatter)
   }
 
   // MARK: - Specific HTTP Method Wrappers
@@ -120,8 +134,6 @@ final class APIClient: APIClientProvider {
 
     if let body = body {
       do {
-        let encoder = JSONEncoder()
-        encoder.keyEncodingStrategy = .convertToSnakeCase
         request.httpBody = try encoder.encode(body)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
       } catch {
@@ -148,8 +160,6 @@ final class APIClient: APIClientProvider {
     }
 
     do {
-      let decoder = JSONDecoder()
-      decoder.keyDecodingStrategy = .convertFromSnakeCase
       return try decoder.decode(T.self, from: data)
     } catch {
       throw NetworkError.decodingError(error)
