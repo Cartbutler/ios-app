@@ -27,7 +27,7 @@ final class SuggestionRepositoryImpl: SuggestionRepository {
   private let container: ModelContainer
 
   init(
-    apiService: APIServiceProvider = APIService(),
+    apiService: APIServiceProvider = APIService.shared,
     container: ModelContainer = MainContainer.shared
   ) {
     self.apiService = apiService
