@@ -15,9 +15,22 @@ struct APIServiceTests {
 
   private let mockAPIClient = MockAPIClientProvider()
   private let sut: APIService
+  private let basicProductDTO = BasicProductDTO(
+    productId: 1,
+    productName: "product",
+    price: 4.99,
+    imagePath: ""
+  )
   private let productDTO = ProductDTO(
-    productId: 1, productName: "product", description: "description", price: 4.99, stock: 10,
-    categoryId: 1, imagePath: "", createdAt: Date())
+    productId: 1,
+    productName: "product",
+    description: "description",
+    price: 4.99,
+    stock: 10,
+    categoryId: 1,
+    imagePath: "",
+    createdAt: Date()
+  )
 
   init() {
     sut = APIService(apiClient: mockAPIClient)
@@ -94,7 +107,7 @@ struct APIServiceTests {
   @Test
   func fetchProductsByQuerySuccess() async throws {
     // Given
-    let expectedResponse = [productDTO]
+    let expectedResponse = [basicProductDTO]
     given(mockAPIClient)
       .get(path: .value("search"), queryParameters: .value(["query": "a"]))
       .willReturn(expectedResponse)
@@ -111,7 +124,7 @@ struct APIServiceTests {
     // Given
     given(mockAPIClient)
       .get(path: .any, queryParameters: .any)
-      .willProduce { _, _ -> [ProductDTO] in
+      .willProduce { _, _ -> [BasicProductDTO] in
         throw NetworkError.invalidResponse
       }
 
@@ -127,7 +140,7 @@ struct APIServiceTests {
   @Test
   func fetchProducstByCategorySuccess() async throws {
     // Given
-    let expectedResponse = [productDTO]
+    let expectedResponse = [basicProductDTO]
     given(mockAPIClient)
       .get(path: .value("search"), queryParameters: .value(["categoryID": "1"]))
       .willReturn(expectedResponse)
@@ -144,7 +157,7 @@ struct APIServiceTests {
     // Given
     given(mockAPIClient)
       .get(path: .any, queryParameters: .any)
-      .willProduce { _, _ -> [ProductDTO] in
+      .willProduce { _, _ -> [BasicProductDTO] in
         throw NetworkError.invalidResponse
       }
 
