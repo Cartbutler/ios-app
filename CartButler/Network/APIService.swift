@@ -12,8 +12,8 @@ import Mockable
 protocol APIServiceProvider: Sendable {
   func fetchCategories() async throws -> [CategoryDTO]
   func fetchSuggestions(query: String) async throws -> [SuggestionDTO]
-  func fetchProducts(query: String) async throws -> [ProductDTO]
-  func fetchProducts(categoryID: Int) async throws -> [ProductDTO]
+  func fetchProducts(query: String) async throws -> [BasicProductDTO]
+  func fetchProducts(categoryID: Int) async throws -> [BasicProductDTO]
 }
 
 final class APIService: APIServiceProvider {
@@ -34,11 +34,11 @@ final class APIService: APIServiceProvider {
     try await apiClient.get(path: "suggestions", queryParameters: ["query": query])
   }
 
-  func fetchProducts(query: String) async throws -> [ProductDTO] {
+  func fetchProducts(query: String) async throws -> [BasicProductDTO] {
     try await apiClient.get(path: "search", queryParameters: ["query": query])
   }
 
-  func fetchProducts(categoryID: Int) async throws -> [ProductDTO] {
+  func fetchProducts(categoryID: Int) async throws -> [BasicProductDTO] {
     try await apiClient.get(path: "search", queryParameters: ["categoryID": String(categoryID)])
   }
 }

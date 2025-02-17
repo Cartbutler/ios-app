@@ -2,7 +2,14 @@
   "sourceLanguage" : "en",
   "strings" : {
     "Account" : {
-
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conta"
+          }
+        }
+      }
     },
     "Cart" : {
       "localizations" : {
@@ -15,7 +22,14 @@
       }
     },
     "CartButler" : {
-
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CartButler"
+          }
+        }
+      }
     },
     "Dairy" : {
       "extractionState" : "manual",
@@ -35,6 +49,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lavanderia"
+          }
+        }
+      }
+    },
+    "Loading products..." : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carregando produtos..."
+          }
+        }
+      }
+    },
+    "No products found" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foram encontrados produtos"
+          }
+        }
+      }
+    },
+    "Retry" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tentar novamente"
           }
         }
       }

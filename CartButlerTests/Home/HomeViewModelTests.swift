@@ -5,7 +5,6 @@
 //  Created by Cassiano Monteiro on 2025-01-26.
 //
 import Mockable
-import SwiftData
 import Testing
 
 @testable import CartButler

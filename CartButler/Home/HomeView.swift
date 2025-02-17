@@ -9,7 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
   @StateObject private var viewModel = HomeViewModel()
-  @State private var searchKey = ""
+  @State private var presentSearchResults = false
 
   @Query(sort: \Category.name)
   private var categories: [Category]
@@ -25,13 +25,19 @@ struct HomeView: View {
           }
         }
       }
+      .navigationDestination(isPresented: $presentSearchResults) {
+        ProductsResultsView(searchType: .query(viewModel.query))
+      }
       .navigationTitle("CartButler")
       .navigationBarTitleDisplayMode(.inline)
       .toolbarBackground(.themePrimary, for: .navigationBar)
     }
     .searchable(text: $viewModel.searchKey, prompt: "Search products")
+    .onSubmit(of: .search) {
+      presentSearchResults = true
+    }
     .searchSuggestions {
-      SuggestionsView(query: viewModel.query)
+      SuggestionsView(searchKey: $viewModel.searchKey, query: viewModel.query)
     }
     .foregroundStyle(.onBackground)
     .backgroundStyle(.themeBackground)
@@ -42,10 +48,10 @@ struct HomeView: View {
 
   private var categoriesGrid: some View {
     ScrollView {
-      LazyVGrid(columns: [.init(.adaptive(minimum: 150))]) {
+      LazyVGrid(columns: [.init(.adaptive(minimum: 150))], spacing: 8) {
         ForEach(categories) { category in
           NavigationLink {
-            CategoryTile(category: category)
+            ProductsResultsView(searchType: .category(category))
           } label: {
             CategoryTile(category: category)
           }
@@ -80,10 +86,11 @@ struct HomeView: View {
 }
 
 struct SuggestionsView: View {
-  @Query
-  private var suggestions: [Suggestion]
+  @Binding private var searchKey: String
+  @Query private var suggestions: [Suggestion]
 
-  init(query: String) {
+  init(searchKey: Binding<String>, query: String) {
+    self._searchKey = searchKey
     _suggestions = Query(
       filter: #Predicate { $0.suggestionSet.query == query },
       sort: [.init(\.priority)]
@@ -92,8 +99,8 @@ struct SuggestionsView: View {
 
   var body: some View {
     ForEach(suggestions) { suggestion in
-      NavigationLink {
-        Text(suggestion.name)
+      Button {
+        searchKey = suggestion.name
       } label: {
         Text(suggestion.name)
       }
