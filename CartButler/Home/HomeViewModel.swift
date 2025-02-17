@@ -19,6 +19,7 @@ final class HomeViewModel: ObservableObject {
       query = searchKey.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     }
   }
+
   @Published private(set) var query = "" {
     didSet {
       fetchSuggestions()
