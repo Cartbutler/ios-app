@@ -30,8 +30,6 @@ struct APIClientTests {
   private let mockSession = MockNetworkSession()
   private let sut: APIClient
   private let mockEndpointURL = URL(string: "https://example.com/api/test")!
-  //  private let requestBody = MockCodable(message: "Request")
-  //  private let successBody = MockCodable(message: "Success")
   private let requestBody = "{ \"message_id\": 1, \"message\": \"request\" }"
   private let successBody =
     """
