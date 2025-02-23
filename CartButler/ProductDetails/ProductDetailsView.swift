@@ -8,23 +8,34 @@
 import SwiftUI
 
 struct ProductDetailsView: View {
-  let product: ProductDTO
 
-  var body: some View {
-    VStack(spacing: 0) {
-      productView
-      Button(action: {
-        print("Add to Cart")
-      }) {
-        Label("Add to Cart", systemImage: "cart")
-          .padding(8)
-      }
-      .buttonStyle(.borderedProminent)
-    }
-    .navigationTitle(product.productName)
+  private let product: BasicProductDTO
+  @StateObject private var viewModel: ProductDetailsViewModel
+
+  init(product: BasicProductDTO) {
+    self.product = product
+    _viewModel = StateObject(wrappedValue: ProductDetailsViewModel(productID: product.id))
   }
 
-  private var productView: some View {
+  var body: some View {
+    Group {
+      if let product = viewModel.product {
+        productView(product: product)
+      } else if viewModel.isLoading {
+        ProgressView("Loading product...")
+      } else {
+        ErrorView(message: viewModel.errorMessage ?? "Error") {
+          Task { await viewModel.fetchProduct() }
+        }
+      }
+    }
+    .navigationTitle(product.productName)
+    .task {
+      await viewModel.fetchProduct()
+    }
+  }
+
+  private func productView(product: ProductDTO) -> some View {
     ScrollView {
       VStack(alignment: .leading) {
 
@@ -59,35 +70,4 @@ struct ProductDetailsView: View {
       }
     }
   }
-}
-
-#Preview("ProductDetailsView Light") {
-  ProductDetailsView(
-    product: ProductDTO(
-      productId: 1,
-      productName: "Product 1",
-      description: "This is the description of Product 1",
-      price: 10.0,
-      stock: 10,
-      categoryId: 1,
-      imagePath: "https://storage.googleapis.com/southern-shard-449119-d4.appspot.com/Apple.png",
-      createdAt: Date()
-    )
-  )
-}
-
-#Preview("ProductDetailsView Dark") {
-  ProductDetailsView(
-    product: ProductDTO(
-      productId: 1,
-      productName: "Product 1",
-      description: "This is the description of Product 1",
-      price: 10.0,
-      stock: 10,
-      categoryId: 1,
-      imagePath: "https://storage.googleapis.com/southern-shard-449119-d4.appspot.com/Apple.png",
-      createdAt: Date()
-    )
-  )
-  .preferredColorScheme(.dark)
 }

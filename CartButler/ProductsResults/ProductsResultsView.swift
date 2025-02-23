@@ -30,12 +30,12 @@ struct ProductsResultsView: View {
         productsGridView
       }
     }
-    .task {
-      await viewModel.fetchProducts()
-    }
     .navigationTitle(viewModel.navigationTitle)
     .foregroundStyle(.onBackground)
     .backgroundStyle(.themeBackground)
+    .task {
+      await viewModel.fetchProducts()
+    }
   }
 
   // MARK: - Private Views
@@ -45,22 +45,9 @@ struct ProductsResultsView: View {
   }
 
   private func errorView(message: String) -> some View {
-    VStack {
-      Image(systemName: "exclamationmark.triangle")
-        .font(.largeTitle)
-        .foregroundColor(.red)
-
-      Text(message)
-        .multilineTextAlignment(.center)
-        .padding()
-
-      Button("Retry") {
-        Task {
-          await viewModel.fetchProducts()
-        }
-      }
+    ErrorView(message: message) {
+      await viewModel.fetchProducts()
     }
-    .padding()
   }
 
   private var emptyResultsView: some View {
@@ -78,7 +65,11 @@ struct ProductsResultsView: View {
     ScrollView {
       LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 16) {
         ForEach(viewModel.products) { product in
-          ProductTile(product: product)
+          NavigationLink {
+            ProductDetailsView(product: product)
+          } label: {
+            ProductTile(product: product)
+          }
         }
       }
       .padding()

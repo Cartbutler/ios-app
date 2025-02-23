@@ -53,6 +53,16 @@
         }
       }
     },
+    "Loading product..." : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carregando produto..."
+          }
+        }
+      }
+    },
     "Loading products..." : {
       "localizations" : {
         "pt-BR" : {
