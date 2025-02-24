@@ -29,7 +29,9 @@ struct APIServiceTests {
     stock: 10,
     categoryId: 1,
     imagePath: "",
-    createdAt: Date()
+    createdAt: Date(),
+    categoryName: "category",
+    productStore: []
   )
 
   init() {
@@ -166,5 +168,21 @@ struct APIServiceTests {
       // When
       _ = try await sut.fetchProducts(categoryID: 1)
     }
+  }
+
+  // MARK: - Product by ID
+
+  @Test
+  func fetchProductSuccess() async throws {
+    // Given
+    given(mockAPIClient)
+      .get(path: .value("product"), queryParameters: .value(["id": "1"]))
+      .willReturn(productDTO)
+
+    // When
+    let result = try await sut.fetchProduct(id: 1)
+
+    // Then
+    #expect(result == productDTO)
   }
 }

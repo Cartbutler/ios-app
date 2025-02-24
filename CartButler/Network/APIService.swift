@@ -14,6 +14,7 @@ protocol APIServiceProvider: Sendable {
   func fetchSuggestions(query: String) async throws -> [SuggestionDTO]
   func fetchProducts(query: String) async throws -> [BasicProductDTO]
   func fetchProducts(categoryID: Int) async throws -> [BasicProductDTO]
+  func fetchProduct(id: Int) async throws -> ProductDTO
 }
 
 final class APIService: APIServiceProvider {
@@ -40,5 +41,9 @@ final class APIService: APIServiceProvider {
 
   func fetchProducts(categoryID: Int) async throws -> [BasicProductDTO] {
     try await apiClient.get(path: "search", queryParameters: ["categoryID": String(categoryID)])
+  }
+
+  func fetchProduct(id: Int) async throws -> ProductDTO {
+    try await apiClient.get(path: "product", queryParameters: ["id": String(id)])
   }
 }

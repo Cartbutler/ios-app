@@ -38,6 +38,7 @@ struct ProductsResultsViewModelTests {
 
     await confirmation { loadStarted in
       let subscription = sut.$isLoading.sink { isLoading in
+        // Then
         if isLoading {
           loadStarted.confirm()
         }
@@ -93,6 +94,7 @@ struct ProductsResultsViewModelTests {
     await sut.fetchProducts()
 
     // Then
+    #expect(sut.isLoading == false)
     #expect(sut.errorMessage != nil)
     #expect(sut.products.isEmpty)
   }
@@ -146,7 +148,7 @@ struct ProductsResultsViewModelTests {
   }
 
   @Test
-  func navigationTitle_ForSearchQuery() throws {
+  func navigationTitleForSearchQuery() throws {
     // Given
     let query = "test"
     // When
@@ -159,7 +161,7 @@ struct ProductsResultsViewModelTests {
   }
 
   @Test
-  func navigationTitle_ForCategory() throws {
+  func navigationTitleForCategory() throws {
     // Given
     let category = Category(id: 1, name: "category", icon: "")
     // When
