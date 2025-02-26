@@ -15,7 +15,7 @@ struct ErrorView: View {
     VStack {
       Image(systemName: "exclamationmark.triangle")
         .font(.largeTitle)
-        .foregroundColor(.red)
+        .foregroundColor(.error)
 
       Text(message)
         .multilineTextAlignment(.center)
@@ -25,7 +25,10 @@ struct ErrorView: View {
         Task { await retryAction() }
       }
       .buttonStyle(.borderedProminent)
+      .foregroundStyle(.onPrimary)
     }
+    .foregroundStyle(.onBackground)
+    .backgroundStyle(.themeBackground)
     .padding()
   }
 }
