@@ -69,7 +69,7 @@ struct ProductDetailsView: View {
       Text(product.productName)
         .font(.largeTitle)
         .fontWeight(.bold)
-      Text(Formatter.currency(from: product.price))
+      Text(viewModel.formattedPrice(from: product))
         .font(.title2)
         .fontWeight(.semibold)
       Text(product.description)
