@@ -112,6 +112,16 @@
           }
         }
       }
+    },
+    "Stores" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lojas"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

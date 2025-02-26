@@ -28,8 +28,8 @@ struct ProductDTO: Decodable, Hashable, Identifiable {
   let createdAt: Date
   let categoryName: String?
   let stores: [StoreDTO]
-  let minPrice: Double
-  let maxPrice: Double
+  let minPrice: Double?
+  let maxPrice: Double?
 
   enum CodingKeys: String, CodingKey {
     case productId
@@ -47,7 +47,8 @@ struct ProductDTO: Decodable, Hashable, Identifiable {
   }
 }
 
-struct StoreDTO: Decodable, Hashable {
+struct StoreDTO: Decodable, Hashable, Identifiable {
+  var id: Int { storeId }
   let storeId: Int
   let price: Double
   let stock: Int
