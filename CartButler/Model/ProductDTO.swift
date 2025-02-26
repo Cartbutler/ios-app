@@ -27,20 +27,30 @@ struct ProductDTO: Decodable, Hashable, Identifiable {
   let imagePath: String
   let createdAt: Date
   let categoryName: String?
-  let productStore: [ProductStoreDTO]
-}
+  let stores: [StoreDTO]
+  let minPrice: Double
+  let maxPrice: Double
 
-struct ProductStoreDTO: Decodable, Hashable {
-  let productStoreId: Int
-  let productId: Int
-  let storeId: Int
-  //  let price: Double
-  let stock: Int
-  let stores: StoreDTO
+  enum CodingKeys: String, CodingKey {
+    case productId
+    case productName
+    case description
+    case price
+    case stock
+    case categoryId
+    case imagePath
+    case createdAt
+    case categoryName
+    case stores
+    case minPrice = "minPrice"
+    case maxPrice = "maxPrice"
+  }
 }
 
 struct StoreDTO: Decodable, Hashable {
   let storeId: Int
+  let price: Double
+  let stock: Int
   let storeName: String
   let storeLocation: String
 }
