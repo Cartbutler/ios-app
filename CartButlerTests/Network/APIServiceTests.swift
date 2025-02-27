@@ -31,7 +31,9 @@ struct APIServiceTests {
     imagePath: "",
     createdAt: Date(),
     categoryName: "category",
-    productStore: []
+    stores: [],
+    minPrice: 3.99,
+    maxPrice: 5.99
   )
 
   init() {
