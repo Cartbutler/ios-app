@@ -102,7 +102,7 @@ struct ProductsResultsViewModelTests {
   @Test
   func fetchProductsByCategorySuccess() async throws {
     // Given
-    let category = Category(id: 1, name: "cateory", icon: "")
+    let category = Category(id: 1, name: "cateory", imagePath: "http://path.to/image")
     let expectedProducts = [basicProductDTO]
     given(mockService)
       .fetchProducts(categoryID: .value(category.id))
@@ -127,7 +127,7 @@ struct ProductsResultsViewModelTests {
   @Test
   func fetchProductsByCategoryFailure() async throws {
     // Given
-    let category = Category(id: 1, name: "cateory", icon: "")
+    let category = Category(id: 1, name: "cateory", imagePath: "http://path.to/image")
     given(mockService)
       .fetchProducts(categoryID: .any)
       .willThrow(NetworkError.invalidResponse)
@@ -163,7 +163,7 @@ struct ProductsResultsViewModelTests {
   @Test
   func navigationTitleForCategory() throws {
     // Given
-    let category = Category(id: 1, name: "category", icon: "")
+    let category = Category(id: 1, name: "cateory", imagePath: "http://path.to/image")
     // When
     let sut = ProductsResultsViewModel(
       apiService: mockService,

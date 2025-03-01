@@ -12,15 +12,15 @@ final class Category {
   @Attribute(.unique)
   var id: Int
   var name: String
-  var icon: String
+  var imagePath: String
 
-  init(id: Int, name: String, icon: String) {
+  init(id: Int, name: String, imagePath: String) {
     self.id = id
     self.name = name
-    self.icon = icon
+    self.imagePath = imagePath
   }
 
   convenience init(dto: CategoryDTO) {
-    self.init(id: dto.categoryId, name: dto.categoryName, icon: "❓")
+    self.init(id: dto.categoryId, name: dto.categoryName, imagePath: dto.imagePath)
   }
 }
