@@ -40,26 +40,10 @@ struct ProductDetailsView: View {
   private func productView(product: ProductDTO) -> some View {
     ScrollView {
       VStack(alignment: .leading) {
-        image(path: product.imagePath)
+        AsyncImageView(imagePath: product.imagePath)
+
         productInfo(with: product)
         Spacer()
-      }
-    }
-  }
-
-  private func image(path: String) -> some View {
-    AsyncImage(url: URL(string: path)) { phase in
-      switch phase {
-      case .empty:
-        ProgressView()
-      case .success(let image):
-        image.resizable().aspectRatio(contentMode: .fit)
-      case .failure:
-        Image(systemName: "photo.circle.fill")
-          .font(.largeTitle)
-          .padding()
-      @unknown default:
-        EmptyView()
       }
     }
   }
