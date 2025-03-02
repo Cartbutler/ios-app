@@ -32,7 +32,9 @@ struct CategoryRepositoryTests {
   @Test
   func fetchCategoriesSuccess() async throws {
     // Given
-    let expectedResponse = [CategoryDTO(categoryId: 1, categoryName: "category")]
+    let expectedResponse = [
+      CategoryDTO(categoryId: 1, categoryName: "category", imagePath: "http://path.to/image")
+    ]
     given(mockAPIService)
       .fetchCategories()
       .willReturn(expectedResponse)

@@ -18,8 +18,7 @@ struct CategoryTile: View {
         Spacer()
         VStack {
           Spacer()
-          Text(category.icon)
-            .font(.largeTitle)
+          AsyncImageView(imagePath: category.imagePath)
           Text(category.name)
             .font(.headline)
             .foregroundColor(.onSurface)
@@ -33,6 +32,12 @@ struct CategoryTile: View {
 }
 
 #Preview("CategoryTile") {
-  CategoryTile(category: Category(id: 1, name: "Category 1", icon: "🍔"))
-    .frame(width: 200, height: 200)
+  CategoryTile(
+    category: Category(
+      id: 1,
+      name: "Category 1",
+      imagePath: "https://storage.googleapis.com/southern-shard-449119-d4.appspot.com/Apple.png"
+    )
+  )
+  .frame(width: 200, height: 200)
 }

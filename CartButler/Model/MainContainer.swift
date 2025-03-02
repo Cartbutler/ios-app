@@ -24,9 +24,20 @@ actor MainContainer {
 
   @MainActor
   private static func createContainer() -> ModelContainer {
-    let schema = Schema([Category.self, Suggestion.self])
+    let models: [any PersistentModel.Type] = [Category.self, Suggestion.self]
+    let schema = Schema(models)
     let modelConfiguration = ModelConfiguration(schema: schema)
-    let container = try! ModelContainer(for: schema, configurations: [modelConfiguration])
+    let container: ModelContainer
+    do {
+      container = try ModelContainer(for: schema, configurations: [modelConfiguration])
+    } catch {
+      // Delete everything and recreate the container in case the DB schema changed
+      models.forEach { model in
+        let tempContainer = try? ModelContainer(for: model)
+        tempContainer?.deleteAllData()
+      }
+      container = try! ModelContainer(for: schema, configurations: [modelConfiguration])
+    }
     return container
   }
 

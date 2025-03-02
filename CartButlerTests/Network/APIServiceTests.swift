@@ -45,7 +45,9 @@ struct APIServiceTests {
   @Test
   func fetchCategoriesSuccess() async throws {
     // Given
-    let expectedResponse = [CategoryDTO(categoryId: 1, categoryName: "category")]
+    let expectedResponse = [
+      CategoryDTO(categoryId: 1, categoryName: "category", imagePath: "http://path.to/image")
+    ]
     given(mockAPIClient)
       .get(path: .value("categories"), queryParameters: .value(nil))
       .willReturn(expectedResponse)

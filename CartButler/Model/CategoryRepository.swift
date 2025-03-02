@@ -12,6 +12,7 @@ import SwiftData
 struct CategoryDTO: Decodable, Equatable {
   let categoryId: Int
   let categoryName: String
+  let imagePath: String
 }
 
 @Mockable
