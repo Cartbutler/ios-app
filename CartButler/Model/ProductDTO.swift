@@ -42,8 +42,8 @@ struct ProductDTO: Decodable, Hashable, Identifiable {
     case createdAt
     case categoryName
     case stores
-    case minPrice = "minPrice"
-    case maxPrice = "maxPrice"
+    case minPrice
+    case maxPrice
   }
 }
 

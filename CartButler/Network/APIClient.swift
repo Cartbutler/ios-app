@@ -18,6 +18,7 @@ extension URLSession: NetworkSession {}
 enum NetworkError: Error, Equatable {
   case invalidURL
   case invalidResponse
+  case invalidSession
   case requestFailed(Error)
   case badStatusCode(Error)
   case decodingError(Error)

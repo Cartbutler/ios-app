@@ -7,6 +7,7 @@
 
 import Foundation
 import Mockable
+import UIKit
 
 @Mockable
 protocol APIServiceProvider: Sendable {
@@ -15,6 +16,7 @@ protocol APIServiceProvider: Sendable {
   func fetchProducts(query: String) async throws -> [BasicProductDTO]
   func fetchProducts(categoryID: Int) async throws -> [BasicProductDTO]
   func fetchProduct(id: Int) async throws -> ProductDTO
+  func addToCart(productId: Int, quantity: Int) async throws -> CartDTO
 }
 
 final class APIService: APIServiceProvider {
@@ -45,5 +47,15 @@ final class APIService: APIServiceProvider {
 
   func fetchProduct(id: Int) async throws -> ProductDTO {
     try await apiClient.get(path: "product", queryParameters: ["id": String(id)])
+  }
+
+  func addToCart(productId: Int, quantity: Int) async throws -> CartDTO {
+    guard let sessionID = await UIDevice.current.identifierForVendor?.uuidString else {
+      throw NetworkError.invalidSession
+    }
+    return try await apiClient.post(
+      path: "cart",
+      body: AddToCartDTO(userId: sessionID, productId: productId, quantity: quantity)
+    )
   }
 }
