@@ -189,4 +189,56 @@ struct APIServiceTests {
     // Then
     #expect(result == productDTO)
   }
+
+  @Test
+  func fetchProductFailure() async throws {
+    // Given
+    given(mockAPIClient)
+      .get(path: .any, queryParameters: .any)
+      .willProduce { _, _ -> ProductDTO in
+        throw NetworkError.invalidResponse
+      }
+
+    // Then
+    await #expect(throws: NetworkError.invalidResponse) {
+      // When
+      _ = try await sut.fetchProduct(id: 1)
+    }
+  }
+
+  // MARK: Cart
+
+  @Test
+  func addToCartSuccess() async throws {
+    // Given
+    let expectedResponse = CartDTO(id: 1, userId: "abcd", productId: 1, quantity: 2)
+    let matcher: (AddToCartDTO) -> Bool = {
+      $0.productId == expectedResponse.productId && $0.quantity == expectedResponse.quantity
+    }
+    given(mockAPIClient)
+      .post(path: .value("cart"), body: .matching(matcher))
+      .willReturn(expectedResponse)
+
+    // When
+    let result = try await sut.addToCart(productId: 1, quantity: 2)
+
+    // Then
+    #expect(result == expectedResponse)
+  }
+
+  @Test
+  func addToCartFailure() async throws {
+    // Given
+    given(mockAPIClient)
+      .post(path: .any, body: .any)
+      .willProduce { (_: String, _: AddToCartDTO) -> CartDTO in
+        throw NetworkError.invalidResponse
+      }
+
+    // Then
+    await #expect(throws: NetworkError.invalidResponse) {
+      // When
+      _ = try await sut.addToCart(productId: 1, quantity: 2)
+    }
+  }
 }
