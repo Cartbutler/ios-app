@@ -16,6 +16,12 @@ struct AddToCartDTO: Encodable {
 struct CartDTO: Decodable, Identifiable, Hashable {
   let id: Int
   let userId: String
+  let cartItems: [CartItemDTO]
+}
+
+struct CartItemDTO: Decodable, Identifiable, Hashable {
+  let id: Int
+  let cartId: Int
   let productId: Int
   let quantity: Int
 }
