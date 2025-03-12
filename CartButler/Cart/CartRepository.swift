@@ -60,6 +60,7 @@ final class CartRepository: CartRepositoryProvider, @unchecked Sendable {
     addToCartTask?.cancel()
     addToCartTask = Task {
 
+      // We need to keep track of temp items that are out-of-sync with the backend cart
       if tempItems[productId] == nil && tempItems.count > 0 {
         for (productId, quantity) in tempItems {
           try await updateCart(productId: productId, quantity: quantity)
@@ -67,20 +68,24 @@ final class CartRepository: CartRepositoryProvider, @unchecked Sendable {
         tempItems = [:]
       }
 
-      // Increment
+      // Increment the quantity based on temp items first.
+      // If no temp item exists, get the item from the current cart.
+      // If the item is not in the cart, default to 0.
       let itemFromCart = cart.cartItems.first { $0.productId == productId }
       tempItems[productId] = (tempItems[productId] ?? itemFromCart?.quantity ?? 0) + increment
       guard let quantity = tempItems[productId], quantity >= 0 else { return }
 
-      // Debounce consecutive calls
+      // Debounce consecutive calls to avoid multiple network requests
       try await Task.sleep(for: .seconds(0.5))
 
+      // Make sure to not update the cart if the task was cancelled.
+      // The item should be removed from the temp items dictionary when the request is made.
       if !Task.isCancelled, let quantity = tempItems.removeValue(forKey: productId) {
         try await updateCart(productId: productId, quantity: quantity)
       }
     }
 
-    // Rethrow error if task fails
+    // Wait task value to rethrow error if it fails.
     do {
       try await addToCartTask?.value
     } catch is CancellationError {
