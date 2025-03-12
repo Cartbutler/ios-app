@@ -11,13 +11,21 @@ final class ProductDetailsViewModel: ObservableObject {
   @Published var product: ProductDTO?
   @Published var isLoading = false
   @Published var errorMessage: String?
+  @Published var alertMessage: String?
+  @Published var showAlert = false
 
   private let apiService: APIServiceProvider
+  private let cartRepository: CartRepositoryProvider
   private let productID: Int
 
-  init(apiService: APIServiceProvider = APIService.shared, productID: Int) {
-    self.productID = productID
+  init(
+    apiService: APIServiceProvider = APIService.shared,
+    cartRepository: CartRepositoryProvider = CartRepository.shared,
+    productID: Int
+  ) {
     self.apiService = apiService
+    self.cartRepository = cartRepository
+    self.productID = productID
   }
 
   func fetchProduct() async {
@@ -42,6 +50,15 @@ final class ProductDetailsViewModel: ObservableObject {
       "\(Formatter.currency(from: minPrice)) - \(Formatter.currency(from: maxPrice))"
     } else {
       Formatter.currency(from: product.price)
+    }
+  }
+
+  func addToCart() async {
+    do {
+      try await cartRepository.increment(productId: productID)
+    } catch {
+      alertMessage = "Failed to add product to cart, please try again."
+      showAlert = true
     }
   }
 }

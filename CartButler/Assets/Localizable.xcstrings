@@ -11,6 +11,16 @@
         }
       }
     },
+    "Add to Cart" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar ao carrinho"
+          }
+        }
+      }
+    },
     "Cart" : {
       "localizations" : {
         "pt-BR" : {
@@ -38,6 +48,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Laticínios"
+          }
+        }
+      }
+    },
+    "Failed to add product to cart, please try again." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erro ao adicionar produto ao carrinho, por favor tente novamente."
           }
         }
       }
@@ -79,6 +100,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Não foram encontrados produtos"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
           }
         }
       }
