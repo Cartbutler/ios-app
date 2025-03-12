@@ -16,6 +16,7 @@ protocol APIServiceProvider: Sendable {
   func fetchProducts(query: String) async throws -> [BasicProductDTO]
   func fetchProducts(categoryID: Int) async throws -> [BasicProductDTO]
   func fetchProduct(id: Int) async throws -> ProductDTO
+  func fetchCart() async throws -> CartDTO
   func addToCart(productId: Int, quantity: Int) async throws -> CartDTO
 }
 
@@ -24,6 +25,15 @@ final class APIService: APIServiceProvider {
   static let shared = APIService()
 
   private let apiClient: APIClientProvider
+
+  private var sessionID: String {
+    get async throws {
+      guard let sessionID = await UIDevice.current.identifierForVendor?.uuidString else {
+        throw NetworkError.invalidSession
+      }
+      return sessionID
+    }
+  }
 
   init(apiClient: APIClientProvider = APIClient.shared) {
     self.apiClient = apiClient
@@ -49,11 +59,12 @@ final class APIService: APIServiceProvider {
     try await apiClient.get(path: "product", queryParameters: ["id": String(id)])
   }
 
+  func fetchCart() async throws -> CartDTO {
+    try await apiClient.get(path: "cart", queryParameters: ["userId": sessionID])
+  }
+
   func addToCart(productId: Int, quantity: Int) async throws -> CartDTO {
-    guard let sessionID = await UIDevice.current.identifierForVendor?.uuidString else {
-      throw NetworkError.invalidSession
-    }
-    return try await apiClient.post(
+    try await apiClient.post(
       path: "cart",
       body: AddToCartDTO(userId: sessionID, productId: productId, quantity: quantity)
     )

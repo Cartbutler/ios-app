@@ -32,19 +32,27 @@ struct ProductDetailsView: View {
     .foregroundStyle(.onBackground)
     .backgroundStyle(.themeBackground)
     .navigationTitle(product.productName)
+    .alert(viewModel.alertMessage ?? "", isPresented: $viewModel.showAlert) {
+      Button("OK") {
+        viewModel.alertMessage = nil
+      }
+    }
     .task {
       await viewModel.fetchProduct()
     }
   }
 
   private func productView(product: ProductDTO) -> some View {
-    ScrollView {
-      VStack(alignment: .leading) {
-        AsyncImageView(imagePath: product.imagePath)
-
-        productInfo(with: product)
-        Spacer()
+    Group {
+      ScrollView {
+        VStack(alignment: .leading) {
+          AsyncImageView(imagePath: product.imagePath)
+          productInfo(with: product)
+          Spacer()
+        }
       }
+      addToCartButton
+        .padding(.bottom, 8)
     }
   }
 
@@ -67,6 +75,19 @@ struct ProductDetailsView: View {
       }
     }
     .padding(.horizontal)
+  }
+
+  private var addToCartButton: some View {
+    Button {
+      Task { await viewModel.addToCart() }
+    } label: {
+      Label("Add to Cart", systemImage: "cart")
+        .frame(maxWidth: .infinity)
+        .padding(8)
+    }
+    .foregroundStyle(.onPrimary)
+    .buttonStyle(.borderedProminent)
+    .padding(.horizontal, 16)
   }
 
   private func storePriceCard(_ store: StoreDTO) -> some View {

@@ -72,7 +72,7 @@ final class APIClient: APIClientProvider {
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     decoder.dateDecodingStrategy = .formatted(dateFormatter)
     encoder = JSONEncoder()
-    encoder.keyEncodingStrategy = .convertToSnakeCase
+    //    encoder.keyEncodingStrategy = .convertToSnakeCase
     encoder.dateEncodingStrategy = .formatted(dateFormatter)
   }
 

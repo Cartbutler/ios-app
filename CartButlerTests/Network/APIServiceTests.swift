@@ -209,18 +209,54 @@ struct APIServiceTests {
   // MARK: Cart
 
   @Test
+  func fetchCartSuccess() async throws {
+    // Given
+    let expectedResponse = CartDTO(
+      cartItems: [.init(id: 1, cartId: 2, productId: 3, quantity: 4)]
+    )
+    given(mockAPIClient)
+      .get(path: .value("cart"), queryParameters: .matching { $0?["userId"] != nil })
+      .willReturn(expectedResponse)
+
+    // When
+    let result = try await sut.fetchCart()
+
+    // Then
+    #expect(result == expectedResponse)
+  }
+
+  @Test
+  func fetchCartFailure() async throws {
+    // Given
+    given(mockAPIClient)
+      .get(path: .any, queryParameters: .any)
+      .willProduce { _, _ -> CartDTO in
+        throw NetworkError.invalidResponse
+      }
+
+    // Then
+    await #expect(throws: NetworkError.invalidResponse) {
+      // When
+      _ = try await sut.fetchCart()
+    }
+  }
+
+  @Test
   func addToCartSuccess() async throws {
     // Given
-    let expectedResponse = CartDTO(id: 1, userId: "abcd", productId: 1, quantity: 2)
+    let expectedResponse = CartDTO(
+      cartItems: [.init(id: 1, cartId: 2, productId: 3, quantity: 4)]
+    )
     let matcher: (AddToCartDTO) -> Bool = {
-      $0.productId == expectedResponse.productId && $0.quantity == expectedResponse.quantity
+      $0.productId == expectedResponse.cartItems.first?.productId
+        && $0.quantity == expectedResponse.cartItems.first?.quantity
     }
     given(mockAPIClient)
       .post(path: .value("cart"), body: .matching(matcher))
       .willReturn(expectedResponse)
 
     // When
-    let result = try await sut.addToCart(productId: 1, quantity: 2)
+    let result = try await sut.addToCart(productId: 3, quantity: 4)
 
     // Then
     #expect(result == expectedResponse)

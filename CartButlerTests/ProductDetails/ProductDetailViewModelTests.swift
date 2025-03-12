@@ -30,10 +30,15 @@ struct ProductDetailsViewModelTests {
   )
 
   private let mockService = MockAPIServiceProvider()
+  private let mockCartRepository = MockCartRepositoryProvider()
   private let sut: ProductDetailsViewModel
 
   init() {
-    sut = ProductDetailsViewModel(apiService: mockService, productID: productDTO.id)
+    sut = ProductDetailsViewModel(
+      apiService: mockService,
+      cartRepository: mockCartRepository,
+      productID: productDTO.id
+    )
   }
 
   // MARK: - Loading state
@@ -151,6 +156,46 @@ struct ProductDetailsViewModelTests {
     let result = sut.formattedPrice(from: product)
     // Then
     #expect(result == "$4.99")
+  }
+
+  // MARK: - Add to cart
+
+  @Test
+  func addToCartSuccess() async throws {
+    // Given
+    given(mockCartRepository)
+      .increment(productId: .value(1))
+      .willReturn()
+    #expect(sut.alertMessage == nil)
+
+    // When
+    await sut.addToCart()
+
+    // Then
+    verify(mockCartRepository)
+      .increment(productId: .value(1))
+      .called(1)
+    #expect(sut.alertMessage == nil)
+    #expect(sut.showAlert == false)
+  }
+
+  @Test
+  func addToCartFailure() async throws {
+    // Given
+    given(mockCartRepository)
+      .increment(productId: .any)
+      .willThrow(NetworkError.invalidResponse)
+    #expect(sut.alertMessage == nil)
+
+    // When
+    await sut.addToCart()
+
+    // Then
+    verify(mockCartRepository)
+      .increment(productId: .value(1))
+      .called(1)
+    #expect(sut.alertMessage != nil)
+    #expect(sut.showAlert == true)
   }
 
   // MARK: - Helpers
