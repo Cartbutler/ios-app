@@ -8,40 +8,55 @@
 import Combine
 import Mockable
 
-@Mockable
-protocol CartRepositoryProvider {
-  var cartPublisher: AnyPublisher<CartDTO?, Never> { get }
-  func refreshCart() async throws
-  func addToCart(productId: Int) async throws
+@globalActor
+actor CartActor: GlobalActor {
+  static let shared = CartActor()
 }
 
-final class CartRepository: CartRepositoryProvider {
+@Mockable
+protocol CartRepositoryProvider: Sendable {
+  var cartPublisher: AnyPublisher<CartDTO, Never> { get }
+  func refreshCart() async throws
+  func increment(productId: Int) async throws
+  func decrement(productId: Int) async throws
+}
 
-  private let apiService: APIServiceProvider
-  private var addToCartTask: Task<Void, Error>?
+final class CartRepository: CartRepositoryProvider, @unchecked Sendable {
 
-  var cartPublisher: AnyPublisher<CartDTO?, Never> {
-    cartSubject.eraseToAnyPublisher()
+  static let shared = CartRepository()
+
+  @CartActor @Published private var cart = CartDTO.empty
+
+  var cartPublisher: AnyPublisher<CartDTO, Never> {
+    $cart.eraseToAnyPublisher()
   }
 
-  @MainActor private var tempItems: [Int: Int] = [:]
+  private let apiService: APIServiceProvider
 
-  init(
-    apiService: APIServiceProvider = APIService.shared
-  ) {
+  @CartActor private var addToCartTask: Task<Void, Error>?
+  @CartActor private var tempItems: [Int: Int] = [:]
+
+  init(apiService: APIServiceProvider = APIService.shared) {
     self.apiService = apiService
   }
 
-  private let cartSubject = CurrentValueSubject<CartDTO?, Never>(nil)
-
+  @CartActor
   func refreshCart() async throws {
-    cartSubject.send(
-      try await apiService.fetchCart()
-    )
+    cart = try await apiService.fetchCart()
   }
 
-  @MainActor
-  func addToCart(productId: Int) async throws {
+  @CartActor
+  func increment(productId: Int) async throws {
+    try await addToCart(productId: productId, increment: 1)
+  }
+
+  @CartActor
+  func decrement(productId: Int) async throws {
+    try await addToCart(productId: productId, increment: -1)
+  }
+
+  @CartActor
+  private func addToCart(productId: Int, increment: Int) async throws {
     addToCartTask?.cancel()
     addToCartTask = Task {
 
@@ -53,11 +68,13 @@ final class CartRepository: CartRepositoryProvider {
       }
 
       // Increment
-      tempItems[productId] = (tempItems[productId] ?? 0) + 1
+      let itemFromCart = cart.cartItems.first { $0.productId == productId }
+      tempItems[productId] = (tempItems[productId] ?? itemFromCart?.quantity ?? 0) + increment
+      guard let quantity = tempItems[productId], quantity >= 0 else { return }
 
       // Debounce consecutive calls
       try await Task.sleep(for: .seconds(0.5))
-      
+
       if !Task.isCancelled, let quantity = tempItems.removeValue(forKey: productId) {
         try await updateCart(productId: productId, quantity: quantity)
       }
@@ -71,9 +88,9 @@ final class CartRepository: CartRepositoryProvider {
     }
   }
 
+  @CartActor
   private func updateCart(productId: Int, quantity: Int) async throws {
-    let cart = try await apiService.addToCart(productId: productId, quantity: quantity)
-    cartSubject.send(cart)
+    cart = try await apiService.addToCart(productId: productId, quantity: quantity)
   }
 
 }

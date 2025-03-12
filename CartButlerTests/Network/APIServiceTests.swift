@@ -212,7 +212,7 @@ struct APIServiceTests {
   func fetchCartSuccess() async throws {
     // Given
     let expectedResponse = CartDTO(
-      id: 1, userId: "abcd", cartItems: [.init(id: 1, cartId: 2, productId: 3, quantity: 4)]
+      cartItems: [.init(id: 1, cartId: 2, productId: 3, quantity: 4)]
     )
     given(mockAPIClient)
       .get(path: .value("cart"), queryParameters: .matching { $0?["userId"] != nil })
@@ -245,7 +245,7 @@ struct APIServiceTests {
   func addToCartSuccess() async throws {
     // Given
     let expectedResponse = CartDTO(
-      id: 1, userId: "abcd", cartItems: [.init(id: 1, cartId: 2, productId: 3, quantity: 4)]
+      cartItems: [.init(id: 1, cartId: 2, productId: 3, quantity: 4)]
     )
     let matcher: (AddToCartDTO) -> Bool = {
       $0.productId == expectedResponse.cartItems.first?.productId
