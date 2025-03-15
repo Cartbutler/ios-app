@@ -14,7 +14,6 @@ final class CartViewModel: ObservableObject {
   @Published var errorMessage: String?
   @Published var showAlert = false
 
-  private var cancellables: Set<AnyCancellable> = []
   private let cartRepository: CartRepositoryProvider
   private var viewAppeared = false
 
@@ -27,10 +26,7 @@ final class CartViewModel: ObservableObject {
     viewAppeared = true
     cartRepository.cartPublisher
       .receive(on: DispatchQueue.main)
-      .sink { [weak self] cart in
-        self?.cart = cart
-      }
-      .store(in: &cancellables)
+      .assign(to: &$cart)
   }
 
   func incrementQuantity(for productId: Int) async {
