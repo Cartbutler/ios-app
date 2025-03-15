@@ -61,7 +61,7 @@ struct ProductDetailsView: View {
       Text(product.productName)
         .font(.largeTitle)
         .fontWeight(.bold)
-      Text(viewModel.formattedPrice(from: product))
+      Text(product.formattedPrice)
         .font(.title2)
         .fontWeight(.semibold)
       Text(product.description)
@@ -70,7 +70,7 @@ struct ProductDetailsView: View {
         .font(.title2)
         .fontWeight(.bold)
         .padding(.top)
-      ForEach(product.stores) { store in
+      ForEach(product.stores ?? []) { store in
         storePriceCard(store)
       }
     }

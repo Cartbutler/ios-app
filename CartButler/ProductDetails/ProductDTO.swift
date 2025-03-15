@@ -18,23 +18,19 @@ struct ProductDTO: Decodable, Hashable, Identifiable {
   let imagePath: String
   let createdAt: Date
   let categoryName: String?
-  let stores: [StoreDTO]
+  let stores: [StoreDTO]?
   let minPrice: Double?
   let maxPrice: Double?
 
-  enum CodingKeys: String, CodingKey {
-    case productId
-    case productName
-    case description
-    case price
-    case stock
-    case categoryId
-    case imagePath
-    case createdAt
-    case categoryName
-    case stores
-    case minPrice
-    case maxPrice
+  var formattedPrice: String {
+    if let minPrice = minPrice,
+      let maxPrice = maxPrice,
+      minPrice < maxPrice
+    {
+      "\(Formatter.currency(from: minPrice)) - \(Formatter.currency(from: maxPrice))"
+    } else {
+      Formatter.currency(from: price)
+    }
   }
 }
 
