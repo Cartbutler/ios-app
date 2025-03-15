@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%lld" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
+          }
+        }
+      }
+    },
     "Account" : {
       "localizations" : {
         "pt-BR" : {
@@ -150,6 +160,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lojas"
+          }
+        }
+      }
+    },
+    "Your cart is empty" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seu carrinho está vazio"
           }
         }
       }

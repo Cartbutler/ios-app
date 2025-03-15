@@ -17,7 +17,7 @@ struct MainView: View {
         .tabItem {
           Label("Search", systemImage: "magnifyingglass")
         }
-      Text("Cart")
+      CartView()
         .tabItem {
           Label("Cart", systemImage: "cart")
         }
