@@ -1,14 +1,14 @@
-import SwiftData
 //
-//  HomeView.swift
+//  SearchView.swift
 //  CartButler
 //
 //  Created by Cassiano Monteiro on 2025-01-23.
 //
+import SwiftData
 import SwiftUI
 
-struct HomeView: View {
-  @StateObject private var viewModel = HomeViewModel()
+struct SearchView: View {
+  @StateObject private var viewModel = SearchViewModel()
   @State private var presentSearchResults = false
 
   @Query(sort: \Category.name)
@@ -109,10 +109,10 @@ struct SuggestionsView: View {
 }
 
 #Preview("English") {
-  HomeView()
+  SearchView()
 }
 
 #Preview("pt-BR") {
-  HomeView()
+  SearchView()
     .environment(\.locale, .init(identifier: "pt-BR"))
 }

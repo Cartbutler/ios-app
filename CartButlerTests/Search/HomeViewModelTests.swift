@@ -1,5 +1,5 @@
 //
-//  HomeViewModelTests.swift
+//  SearchViewModelTests.swift
 //  CartButler
 //
 //  Created by Cassiano Monteiro on 2025-01-26.
@@ -10,14 +10,14 @@ import Testing
 @testable import CartButler
 
 @MainActor
-struct HomeViewModelTests {
+struct SearchViewModelTests {
 
   private let mockCategoryRepository = MockCategoryRepository()
   private let mockSuggestionRepository = MockSuggestionRepository()
-  private let sut: HomeViewModel
+  private let sut: SearchViewModel
 
   init() async throws {
-    sut = HomeViewModel(
+    sut = SearchViewModel(
       categoryRepository: mockCategoryRepository,
       suggestionRepository: mockSuggestionRepository
     )

@@ -1,5 +1,5 @@
 //
-//  HomeViewModel.swift
+//  SearchViewModel.swift
 //  CartButler
 //
 //  Created by Cassiano Monteiro on 2025-01-25.
@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 
 @MainActor
-final class HomeViewModel: ObservableObject {
+final class SearchViewModel: ObservableObject {
 
   private let categoryRepository: CategoryRepository
   private let suggestionRepository: SuggestionRepository

@@ -6,15 +6,6 @@
 //
 import Foundation
 
-struct BasicProductDTO: Decodable, Hashable, Identifiable {
-  var id: Int { productId }
-
-  let productId: Int
-  let productName: String
-  let price: Double
-  let imagePath: String
-}
-
 struct ProductDTO: Decodable, Hashable, Identifiable {
   var id: Int { productId }
 
