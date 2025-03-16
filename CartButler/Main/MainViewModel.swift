@@ -11,10 +11,10 @@ import Foundation
 @MainActor
 final class MainViewModel: ObservableObject {
   @Published private(set) var cartCount = 0
-  private var viewAppeared = false
 
-  private let cartRepository: CartRepositoryProvider
   private var cancellables: Set<AnyCancellable> = []
+  private let cartRepository: CartRepositoryProvider
+  private var viewAppeared = false
 
   init(cartRepository: CartRepositoryProvider = CartRepository.shared) {
     self.cartRepository = cartRepository

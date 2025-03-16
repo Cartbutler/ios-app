@@ -26,4 +26,13 @@ struct CartItemDTO: Decodable, Identifiable, Hashable {
   let cartId: Int
   let productId: Int
   let quantity: Int
+  let product: ProductDTO
+
+  enum CodingKeys: String, CodingKey {
+    case id
+    case cartId
+    case productId
+    case quantity
+    case product = "products"
+  }
 }
