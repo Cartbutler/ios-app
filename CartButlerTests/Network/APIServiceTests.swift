@@ -277,4 +277,54 @@ struct APIServiceTests {
       _ = try await sut.addToCart(productId: 1, quantity: 2)
     }
   }
+
+  // MARK: - Shopping Results
+
+  @Test
+  func fetchShoppingResultsSuccess() async throws {
+    // Given
+    let expectedResponse = [
+      ShoppingResultsDTO(
+        storeId: 1,
+        storeName: "Test Store",
+        storeLocation: "Test Location",
+        products: [
+          .init(
+            productName: "Test Product",
+            price: 9.99,
+            quantity: 2
+          )
+        ],
+        total: 19.98
+      )
+    ]
+    let matcher: ([String: String]?) -> Bool = {
+      $0?["cartId"] == "123" && $0?["userId"] != nil
+    }
+    given(mockAPIClient)
+      .get(path: .value("shopping-results"), queryParameters: .matching(matcher))
+      .willReturn(expectedResponse)
+
+    // When
+    let result = try await sut.fetchShoppingResults(cartId: 123)
+
+    // Then
+    #expect(result == expectedResponse)
+  }
+
+  @Test
+  func fetchShoppingResultsFailure() async throws {
+    // Given
+    given(mockAPIClient)
+      .get(path: .any, queryParameters: .any)
+      .willProduce { _, _ -> [ShoppingResultsDTO] in
+        throw NetworkError.invalidResponse
+      }
+
+    // Then
+    await #expect(throws: NetworkError.invalidResponse) {
+      // When
+      _ = try await sut.fetchShoppingResults(cartId: 123)
+    }
+  }
 }

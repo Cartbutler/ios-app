@@ -18,6 +18,7 @@ protocol APIServiceProvider: Sendable {
   func fetchProduct(id: Int) async throws -> ProductDTO
   func fetchCart() async throws -> CartDTO
   func addToCart(productId: Int, quantity: Int) async throws -> CartDTO
+  func fetchShoppingResults(cartId: Int) async throws -> [ShoppingResultsDTO]
 }
 
 final class APIService: APIServiceProvider {
@@ -67,6 +68,13 @@ final class APIService: APIServiceProvider {
     try await apiClient.post(
       path: "cart",
       body: AddToCartDTO(userId: sessionID, productId: productId, quantity: quantity)
+    )
+  }
+
+  func fetchShoppingResults(cartId: Int) async throws -> [ShoppingResultsDTO] {
+    try await apiClient.get(
+      path: "shopping-results",
+      queryParameters: ["cartId": String(cartId), "userId": sessionID]
     )
   }
 }
