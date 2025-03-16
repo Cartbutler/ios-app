@@ -60,6 +60,9 @@ struct CartView: View {
           }
         )
       }
+      .onDelete { indexSet in
+        Task { await viewModel.removeItemsFromIndexSet(indexSet) }
+      }
     }
     .listStyle(.plain)
   }
