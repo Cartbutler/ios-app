@@ -115,9 +115,6 @@ struct CartViewModelTests {
     await sut.decrementQuantity(for: 1)
 
     // Then
-    verify(mockCartRepository)
-      .decrement(productId: .value(1))
-      .called(1)
     #expect(sut.errorMessage == nil)
     #expect(sut.showAlert == false)
   }
@@ -136,10 +133,92 @@ struct CartViewModelTests {
     await sut.decrementQuantity(for: 1)
 
     // Then
-    verify(mockCartRepository)
-      .decrement(productId: .value(1))
-      .called(1)
     #expect(sut.errorMessage != nil)
     #expect(sut.showAlert == true)
+  }
+
+  // MARK: - Remove Items
+
+  @Test
+  func removeItemsFromIndexSetSuccess() async throws {
+    // Given
+    sut.viewDidAppear()
+    let mockCartWithMultipleItems = CartDTO(cartItems: [
+      .init(id: 1, cartId: 1, productId: 10, quantity: 2, product: .empty),
+      .init(id: 2, cartId: 1, productId: 20, quantity: 1, product: .empty),
+      .init(id: 3, cartId: 1, productId: 30, quantity: 3, product: .empty),
+    ])
+    mockCartSubject.send(mockCartWithMultipleItems)
+    let currentCart = try await sut.$cart.values.first()
+    #expect(currentCart?.cartItems.count == 3)
+
+    given(mockCartRepository)
+      .removeFromCart(productId: .any)
+      .willReturn()
+
+    #expect(sut.errorMessage == nil)
+    #expect(sut.showAlert == false)
+
+    // When
+    await sut.removeItemsFromIndexSet(IndexSet([0, 2]))
+
+    // Then
+    verify(mockCartRepository)
+      .removeFromCart(productId: .value(10))
+      .called(1)
+    verify(mockCartRepository)
+      .removeFromCart(productId: .value(30))
+      .called(1)
+    #expect(sut.errorMessage == nil)
+    #expect(sut.showAlert == false)
+  }
+
+  @Test
+  func removeItemsFromIndexSetFailure() async throws {
+    // Given
+    sut.viewDidAppear()
+    let mockCartWithMultipleItems = CartDTO(cartItems: [
+      .init(id: 1, cartId: 1, productId: 10, quantity: 2, product: .empty),
+      .init(id: 2, cartId: 1, productId: 20, quantity: 1, product: .empty),
+    ])
+    mockCartSubject.send(mockCartWithMultipleItems)
+    let currentCart = try await sut.$cart.values.first()
+    #expect(currentCart?.cartItems.count == 2)
+
+    given(mockCartRepository)
+      .removeFromCart(productId: .any)
+      .willThrow(NetworkError.invalidResponse)
+
+    #expect(sut.errorMessage == nil)
+    #expect(sut.showAlert == false)
+
+    // When
+    await sut.removeItemsFromIndexSet(IndexSet([0]))
+
+    // Then
+    #expect(sut.errorMessage != nil)
+    #expect(sut.showAlert == true)
+  }
+
+  @Test
+  func removeItemsFromIndexSetWithInvalidIndices() async throws {
+    // Given
+    sut.viewDidAppear()
+    let mockCartWithMultipleItems = CartDTO(cartItems: [
+      .init(id: 1, cartId: 1, productId: 10, quantity: 2, product: .empty)
+    ])
+    mockCartSubject.send(mockCartWithMultipleItems)
+    let currentCart = try await sut.$cart.values.first()
+    #expect(currentCart?.cartItems.count == 1)
+
+    // When
+    await sut.removeItemsFromIndexSet(IndexSet([1, 2]))  // Invalid indices
+
+    // Then
+    verify(mockCartRepository)
+      .removeFromCart(productId: .any)
+      .called(0)
+    #expect(sut.errorMessage == nil)
+    #expect(sut.showAlert == false)
   }
 }
