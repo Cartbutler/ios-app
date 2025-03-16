@@ -46,4 +46,20 @@ final class CartViewModel: ObservableObject {
       showAlert = true
     }
   }
+
+  func removeItemsFromIndexSet(_ indexSet: IndexSet) async {
+    let productIds: [Int] = indexSet.compactMap { index in
+      guard index < cart.cartItems.count else { return nil }
+      return cart.cartItems[index].productId
+    }
+
+    for productId in productIds {
+      do {
+        try await cartRepository.removeFromCart(productId: productId)
+      } catch {
+        errorMessage = "Failed to remove item from cart"
+        showAlert = true
+      }
+    }
+  }
 }
