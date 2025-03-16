@@ -19,6 +19,7 @@ protocol CartRepositoryProvider: Sendable {
   func refreshCart() async throws
   func increment(productId: Int) async throws
   func decrement(productId: Int) async throws
+  func removeFromCart(productId: Int) async throws
 }
 
 final class CartRepository: CartRepositoryProvider, @unchecked Sendable {
@@ -56,17 +57,33 @@ final class CartRepository: CartRepositoryProvider, @unchecked Sendable {
   }
 
   @CartActor
+  func removeFromCart(productId: Int) async throws {
+    addToCartTask?.cancel()
+    addToCartTask = Task {
+      // Handle any pending temp items first
+      try await handleTempItems(for: productId)
+
+      // Remove the item from temp items if it exists
+      tempItems.removeValue(forKey: productId)
+
+      // Update the cart with quantity 0 to remove the item
+      try await updateCart(productId: productId, quantity: 0)
+    }
+
+    // Wait for task value to rethrow error if it fails
+    do {
+      try await addToCartTask?.value
+    } catch is CancellationError {
+      // Don't rethrow if task was cancelled
+    }
+  }
+
+  @CartActor
   private func addToCart(productId: Int, increment: Int) async throws {
     addToCartTask?.cancel()
     addToCartTask = Task {
-
-      // We need to keep track of temp items that are out-of-sync with the backend cart
-      if tempItems[productId] == nil && tempItems.count > 0 {
-        for (productId, quantity) in tempItems {
-          try await updateCart(productId: productId, quantity: quantity)
-        }
-        tempItems = [:]
-      }
+      // Handle any pending temp items first
+      try await handleTempItems(for: productId)
 
       // Increment the quantity based on temp items first.
       // If no temp item exists, get the item from the current cart.
@@ -90,6 +107,17 @@ final class CartRepository: CartRepositoryProvider, @unchecked Sendable {
       try await addToCartTask?.value
     } catch is CancellationError {
       // Don't rethrow if task was cancelled
+    }
+  }
+
+  @CartActor
+  func handleTempItems(for productId: Int) async throws {
+    // We need to keep track of temp items that are out-of-sync with the backend cart
+    if tempItems[productId] == nil && tempItems.count > 0 {
+      for (productId, quantity) in tempItems {
+        try await updateCart(productId: productId, quantity: quantity)
+      }
+      tempItems = [:]
     }
   }
 

@@ -137,6 +137,48 @@ struct CartRepositoryTests {
     }
   }
 
+  // MARK: - removeFromCart
+
+  @Test
+  func removeFromCartSuccess() async throws {
+    // Given
+    let initialCart = CartDTO(cartItems: [
+      .init(id: 1, cartId: 2, productId: 3, quantity: 2, product: .empty)
+    ])
+    given(mockAPIService)
+      .fetchCart()
+      .willReturn(initialCart)
+    try await sut.refreshCart()
+    let currentCart = try await sut.cartPublisher.values.first()
+    #expect(currentCart == initialCart)
+
+    let expectedResponse = CartDTO(cartItems: [])
+    given(mockAPIService)
+      .addToCart(productId: .value(3), quantity: .value(0))
+      .willReturn(expectedResponse)
+
+    // When
+    try await sut.removeFromCart(productId: 3)
+
+    // Then
+    let result = await sut.cartPublisher.values.first(where: { $0.isEmpty })
+    #expect(result == expectedResponse)
+  }
+
+  @Test
+  func removeFromCartFailure() async throws {
+    // Given
+    given(mockAPIService)
+      .addToCart(productId: .any, quantity: .any)
+      .willProduce { _, _ in throw NetworkError.invalidResponse }
+
+    // Then
+    await #expect(throws: NetworkError.invalidResponse) {
+      // When
+      try await sut.removeFromCart(productId: 3)
+    }
+  }
+
   // MARK: - debonce
 
   @Test
