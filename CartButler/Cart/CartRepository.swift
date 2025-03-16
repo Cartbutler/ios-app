@@ -111,7 +111,7 @@ final class CartRepository: CartRepositoryProvider, @unchecked Sendable {
   }
 
   @CartActor
-  func handleTempItems(for productId: Int) async throws {
+  private func handleTempItems(for productId: Int) async throws {
     // We need to keep track of temp items that are out-of-sync with the backend cart
     if tempItems[productId] == nil && tempItems.count > 0 {
       for (productId, quantity) in tempItems {
