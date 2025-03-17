@@ -9,10 +9,12 @@ import Foundation
 
 @MainActor
 final class ShoppingResultsViewModel: ObservableObject {
-  @Published var results: [ShoppingResultsDTO]?
-  @Published var isLoading = false
-  @Published var errorMessage: String?
+  @Published private(set) var results: [ShoppingResultsDTO]?
+  @Published private(set) var isLoading = false
   @Published var showAlert = false
+  @Published var errorMessage: String? {
+    didSet { if errorMessage?.isEmpty == false { showAlert = true } }
+  }
 
   private let apiService: APIServiceProvider
   private let cartRepository: CartRepositoryProvider
@@ -39,7 +41,6 @@ final class ShoppingResultsViewModel: ObservableObject {
       }
     } catch {
       errorMessage = "Failed to load shopping results: \(error.localizedDescription)"
-      showAlert = true
     }
 
     isLoading = false
