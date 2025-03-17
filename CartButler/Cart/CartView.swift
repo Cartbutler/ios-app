@@ -11,14 +11,18 @@ struct CartView: View {
   @StateObject private var viewModel = CartViewModel()
 
   var body: some View {
-
     NavigationStack {
       withAnimation {
         Group {
           if viewModel.cart.isEmpty {
             emptyCartView
           } else {
-            cartItemsList
+            VStack {
+              cartItemsList
+              Spacer()
+              shoppingResultsButton
+                .padding(.bottom, 8)
+            }
           }
         }
       }
@@ -65,5 +69,18 @@ struct CartView: View {
       }
     }
     .listStyle(.plain)
+  }
+
+  private var shoppingResultsButton: some View {
+    NavigationLink {
+      ShoppingResultsView()
+    } label: {
+      Label("Compare Prices", systemImage: "cart.badge.questionmark")
+        .frame(maxWidth: .infinity)
+        .padding(8)
+    }
+    .foregroundStyle(.onPrimary)
+    .buttonStyle(.borderedProminent)
+    .padding(.horizontal, 16)
   }
 }
