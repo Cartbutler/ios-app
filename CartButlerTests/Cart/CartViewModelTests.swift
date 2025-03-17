@@ -149,7 +149,7 @@ struct CartViewModelTests {
       .init(id: 3, cartId: 1, productId: 30, quantity: 3, product: .empty),
     ])
     mockCartSubject.send(mockCartWithMultipleItems)
-    let currentCart = try await sut.$cart.values.first()
+    let currentCart = await sut.$cart.values.first { !$0.isEmpty }
     #expect(currentCart?.cartItems.count == 3)
 
     given(mockCartRepository)
@@ -182,7 +182,7 @@ struct CartViewModelTests {
       .init(id: 2, cartId: 1, productId: 20, quantity: 1, product: .empty),
     ])
     mockCartSubject.send(mockCartWithMultipleItems)
-    let currentCart = try await sut.$cart.values.first()
+    let currentCart = await sut.$cart.values.first { !$0.isEmpty }
     #expect(currentCart?.cartItems.count == 2)
 
     given(mockCartRepository)
@@ -208,7 +208,7 @@ struct CartViewModelTests {
       .init(id: 1, cartId: 1, productId: 10, quantity: 2, product: .empty)
     ])
     mockCartSubject.send(mockCartWithMultipleItems)
-    let currentCart = try await sut.$cart.values.first()
+    let currentCart = await sut.$cart.values.first { !$0.isEmpty }
     #expect(currentCart?.cartItems.count == 1)
 
     // When
