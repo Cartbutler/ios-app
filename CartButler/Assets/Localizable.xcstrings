@@ -11,6 +11,46 @@
         }
       }
     },
+    "%lld items" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld item"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld items"
+                }
+              }
+            }
+          }
+        },
+        "pt-BR" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld item"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld itens"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "Account" : {
       "localizations" : {
         "pt-BR" : {
@@ -47,6 +87,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "CartButler"
+          }
+        }
+      }
+    },
+    "Compare Prices" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comparar preços"
           }
         }
       }
@@ -104,12 +154,32 @@
         }
       }
     },
+    "Loading results..." : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carregando resultados..."
+          }
+        }
+      }
+    },
     "No products found" : {
       "localizations" : {
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Não foram encontrados produtos"
+          }
+        }
+      }
+    },
+    "No shopping results found" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nenhum resultado encontrado"
           }
         }
       }
@@ -150,6 +220,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pesquisar produtos"
+          }
+        }
+      }
+    },
+    "Shopping Results" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resultados"
           }
         }
       }
