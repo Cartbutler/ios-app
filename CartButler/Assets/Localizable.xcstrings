@@ -71,6 +71,16 @@
         }
       }
     },
+    "Best Deal" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Melhor preço"
+          }
+        }
+      }
+    },
     "Cart" : {
       "localizations" : {
         "pt-BR" : {
@@ -190,6 +200,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
+          }
+        }
+      }
+    },
+    "Other Options" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outras opções"
           }
         }
       }
