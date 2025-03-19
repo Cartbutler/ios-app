@@ -14,38 +14,50 @@ import Testing
 
 @MainActor
 struct ShoppingResultsViewModelTests {
-
-  private let shoppingResults = [
-    ShoppingResultsDTO(
-      storeId: 1,
-      storeName: "Store 1",
-      storeLocation: "Location 1",
-      products: [],
-      total: 10.99
-    ),
-    ShoppingResultsDTO(
-      storeId: 2,
-      storeName: "Store 2",
-      storeLocation: "Location 2",
-      products: [],
-      total: 12.99
-    ),
-  ]
+  private let mockAPIService = MockAPIServiceProvider()
+  private let mockCartRepository = MockCartRepositoryProvider()
+  private let mockCartSubject: CurrentValueSubject<CartDTO, Never>
+  private let sut: ShoppingResultsViewModel
 
   private let cartDTO = CartDTO(
     cartItems: [.init(id: 1, cartId: 1, productId: 3, quantity: 4, product: .empty)]
   )
 
-  private let mockAPIService = MockAPIServiceProvider()
-  private let mockCartRepository = MockCartRepositoryProvider()
-  private let mockCartSubject: CurrentValueSubject<CartDTO, Never>
-  private let sut: ShoppingResultsViewModel
+  private let cheapestResult = ShoppingResultsDTO(
+    storeId: 1,
+    storeName: "Cheapest Store",
+    storeLocation: "Location 1",
+    products: [],
+    total: 10.99
+  )
+
+  private let otherResult1 = ShoppingResultsDTO(
+    storeId: 2,
+    storeName: "Medium Store",
+    storeLocation: "Location 2",
+    products: [],
+    total: 12.99
+  )
+
+  private let otherResult2 =
+    ShoppingResultsDTO(
+      storeId: 3,
+      storeName: "Expensive Store",
+      storeLocation: "Location 3",
+      products: [],
+      total: 15.99
+    )
+
+  private let sortedShoppingResults: [ShoppingResultsDTO]
+  private let otherResults: [ShoppingResultsDTO]
 
   init() {
     sut = ShoppingResultsViewModel(
       apiService: mockAPIService,
       cartRepository: mockCartRepository
     )
+    sortedShoppingResults = [cheapestResult, otherResult1, otherResult2]
+    otherResults = [otherResult1, otherResult2]
     mockCartSubject = CurrentValueSubject<CartDTO, Never>(cartDTO)
     given(mockCartRepository)
       .cartPublisher
@@ -59,7 +71,7 @@ struct ShoppingResultsViewModelTests {
     // Given
     given(mockAPIService)
       .fetchShoppingResults(cartId: .any)
-      .willReturn(shoppingResults)
+      .willReturn(sortedShoppingResults)
     #expect(sut.isLoading == false)
 
     await confirmation { loadStarted in
@@ -85,11 +97,11 @@ struct ShoppingResultsViewModelTests {
     // Given
     given(mockAPIService)
       .fetchShoppingResults(cartId: .value(1))
-      .willReturn(shoppingResults)
+      .willReturn(sortedShoppingResults)
 
     #expect(sut.errorMessage == nil)
     #expect(sut.showAlert == false)
-    #expect(sut.results == nil)
+    #expect(sut.cheapestResult == nil)
 
     // When
     await sut.fetchResults()
@@ -97,7 +109,8 @@ struct ShoppingResultsViewModelTests {
     // Then
     #expect(sut.errorMessage == nil)
     #expect(sut.showAlert == false)
-    #expect(sut.results == shoppingResults)
+    #expect(sut.cheapestResult == cheapestResult)
+    #expect(sut.otherResults == otherResults)
   }
 
   @Test
@@ -109,7 +122,8 @@ struct ShoppingResultsViewModelTests {
 
     #expect(sut.errorMessage == nil)
     #expect(sut.showAlert == false)
-    #expect(sut.results == nil)
+    #expect(sut.cheapestResult == nil)
+    #expect(sut.otherResults == nil)
 
     // When
     await sut.fetchResults()
@@ -117,7 +131,8 @@ struct ShoppingResultsViewModelTests {
     // Then
     #expect(sut.errorMessage != nil)
     #expect(sut.showAlert == true)
-    #expect(sut.results == nil)
+    #expect(sut.cheapestResult == nil)
+    #expect(sut.otherResults == nil)
   }
 
   @Test
@@ -126,7 +141,8 @@ struct ShoppingResultsViewModelTests {
     mockCartSubject.send(CartDTO.empty)
     #expect(sut.errorMessage == nil)
     #expect(sut.showAlert == false)
-    #expect(sut.results == nil)
+    #expect(sut.cheapestResult == nil)
+    #expect(sut.otherResults == nil)
 
     // When
     await sut.fetchResults()
@@ -134,7 +150,8 @@ struct ShoppingResultsViewModelTests {
     // Then
     #expect(sut.errorMessage == "No items in cart")
     #expect(sut.showAlert == true)
-    #expect(sut.results == nil)
+    #expect(sut.cheapestResult == nil)
+    #expect(sut.otherResults == nil)
     verify(mockAPIService)
       .fetchShoppingResults(cartId: .any)
       .called(0)
@@ -145,7 +162,7 @@ struct ShoppingResultsViewModelTests {
     // Given
     given(mockAPIService)
       .fetchShoppingResults(cartId: .value(1))
-      .willReturn(shoppingResults)
+      .willReturn(sortedShoppingResults)
 
     // When
     await sut.fetchResults()  // First call
@@ -162,16 +179,90 @@ struct ShoppingResultsViewModelTests {
     // Given
     given(mockAPIService)
       .fetchShoppingResults(cartId: .value(1))
-      .willReturn(shoppingResults)
+      .willReturn(sortedShoppingResults)
 
     // When
-    async let firstCall = sut.fetchResults()
-    async let secondCall = sut.fetchResults()
-    await [firstCall, secondCall]
+    async let firstCall: () = sut.fetchResults()
+    async let secondCall: () = sut.fetchResults()
+    _ = await (firstCall, secondCall)
 
     // Then
     verify(mockAPIService)
       .fetchShoppingResults(cartId: .value(1))
       .called(1)  // Should only be called once
+  }
+
+  // MARK: - Cheapest Result Tests
+
+  @Test
+  func fetchResultsShouldSeparateCheapestResult() async throws {
+    // Given
+    given(mockAPIService)
+      .fetchShoppingResults(cartId: .value(1))
+      .willReturn(sortedShoppingResults)
+
+    #expect(sut.cheapestResult == nil)
+    #expect(sut.otherResults == nil)
+
+    // When
+    await sut.fetchResults()
+
+    // Then
+    #expect(sut.cheapestResult?.storeId == 1)
+    #expect(sut.cheapestResult?.total == 10.99)
+    #expect(sut.otherResults?.count == 2)
+    #expect(sut.otherResults?.first?.storeId == 2)
+    #expect(sut.otherResults?.last?.storeId == 3)
+  }
+
+  @Test
+  func fetchResultsWithSingleResultShouldHaveNoCheapestResult() async throws {
+    // Given
+    let singleResult = [cheapestResult]
+    given(mockAPIService)
+      .fetchShoppingResults(cartId: .value(1))
+      .willReturn(singleResult)
+
+    // When
+    await sut.fetchResults()
+
+    // Then
+    #expect(sut.cheapestResult?.storeId == 1)
+    #expect(sut.otherResults == [])
+  }
+
+  @Test
+  func fetchResultsWithEmptyResultsShouldHaveNoResults() async throws {
+    // Given
+    given(mockAPIService)
+      .fetchShoppingResults(cartId: .value(1))
+      .willReturn([])
+
+    // When
+    await sut.fetchResults()
+
+    // Then
+    #expect(sut.cheapestResult == nil)
+    #expect(sut.otherResults == nil)
+  }
+
+  @Test
+  func fetchResultsFailureShouldClearBothResults() async throws {
+    // Given
+    given(mockAPIService)
+      .fetchShoppingResults(cartId: .any)
+      .willThrow(NetworkError.invalidResponse)
+
+    #expect(sut.cheapestResult == nil)
+    #expect(sut.otherResults == nil)
+
+    // When
+    await sut.fetchResults()
+
+    // Then
+    #expect(sut.cheapestResult == nil)
+    #expect(sut.otherResults == nil)
+    #expect(sut.errorMessage != nil)
+    #expect(sut.showAlert == true)
   }
 }

@@ -16,8 +16,13 @@ struct ShoppingResultsView: View {
         loadingView
       } else if let errorMessage = viewModel.errorMessage {
         errorView(message: errorMessage)
-      } else if let results = viewModel.results, !results.isEmpty {
-        resultsList(with: results)
+      } else if let cheapest = viewModel.cheapestResult {
+        VStack(spacing: 16) {
+          bestDealSection(cheapest)
+          if let others = viewModel.otherResults, !others.isEmpty {
+            otherResultsList(with: others)
+          }
+        }
       } else {
         emptyResultsView
       }
@@ -57,35 +62,104 @@ struct ShoppingResultsView: View {
     }
   }
 
-  private func resultsList(with results: [ShoppingResultsDTO]) -> some View {
-    List {
-      ForEach(results) { result in
-        storeRow(result: result)
-      }
+  private func bestDealSection(_ result: ShoppingResultsDTO) -> some View {
+    VStack(alignment: .leading, spacing: 12) {
+      Text("Best Deal")
+        .font(.title)
+        .fontWeight(.bold)
+        .padding(.horizontal)
+
+      storeRow(result: result, style: .bestDeal)
+        .padding()
+        .background(
+          RoundedRectangle(cornerRadius: 12)
+            .fill(Color.themeSurface)
+        )
+        .overlay(
+          RoundedRectangle(cornerRadius: 12)
+            .strokeBorder(Color.themePrimary, lineWidth: 2)
+        )
+        .padding(.horizontal)
     }
-    .listStyle(.plain)
   }
 
-  private func storeRow(result: ShoppingResultsDTO) -> some View {
+  private func otherResultsList(with results: [ShoppingResultsDTO]) -> some View {
+    VStack(alignment: .leading) {
+      Text("Other Options")
+        .font(.title3)
+        .fontWeight(.semibold)
+        .padding(.horizontal)
+
+      List {
+        ForEach(results) { result in
+          storeRow(result: result)
+        }
+      }
+      .listStyle(.plain)
+    }
+  }
+
+  private func storeRow(result: ShoppingResultsDTO, style: StoreRowStyle = .others) -> some View {
     HStack {
       Image(systemName: "photo.circle.fill")
-        .font(.largeTitle)
-        .frame(width: 60, height: 60)
+        .resizable()
+        .frame(width: style.imageSize, height: style.imageSize)
       VStack(alignment: .leading) {
         Text(result.storeName)
-          .font(.headline)
+          .font(style.nameFont)
+          .fontWeight(.bold)
         Text(result.storeLocation)
-          .font(.subheadline)
+          .font(style.locationFont)
           .foregroundColor(.secondary)
       }
       Spacer()
       VStack(alignment: .trailing) {
         Text(Formatter.currency(from: result.total))
-          .font(.title3)
+          .font(style.priceFont)
           .fontWeight(.bold)
         Text("\(result.products.count) items")
-          .font(.subheadline)
+          .font(style.itemsFont)
           .foregroundColor(.secondary)
+      }
+    }
+  }
+
+  private enum StoreRowStyle {
+    case bestDeal
+    case others
+
+    var imageSize: CGFloat {
+      switch self {
+      case .bestDeal: 60
+      case .others: 40
+      }
+    }
+
+    var nameFont: Font {
+      switch self {
+      case .bestDeal: .largeTitle
+      case .others: .headline
+      }
+    }
+
+    var locationFont: Font {
+      switch self {
+      case .bestDeal: .subheadline
+      case .others: .subheadline
+      }
+    }
+
+    var priceFont: Font {
+      switch self {
+      case .bestDeal: .title
+      case .others: .title3
+      }
+    }
+
+    var itemsFont: Font {
+      switch self {
+      case .bestDeal: .subheadline
+      case .others: .subheadline
       }
     }
   }
