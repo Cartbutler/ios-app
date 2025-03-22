@@ -15,9 +15,13 @@ struct ShoppingResultsDTO: Codable, Hashable, Identifiable {
   let total: Double
 
   struct ProductDTO: Codable, Hashable, Identifiable {
-    var id: String { productName }
+    let id = UUID().uuidString
     let productName: String
     let price: Double
     let quantity: Int
+
+    var total: Double {
+      price * Double(quantity)
+    }
   }
 }
