@@ -212,6 +212,7 @@ struct APIServiceTests {
   func fetchCartSuccess() async throws {
     // Given
     let expectedResponse = CartDTO(
+      id: 1,
       cartItems: [.init(id: 1, cartId: 2, productId: 3, quantity: 4, product: .empty)]
     )
     given(mockAPIClient)
@@ -245,6 +246,7 @@ struct APIServiceTests {
   func addToCartSuccess() async throws {
     // Given
     let expectedResponse = CartDTO(
+      id: 1,
       cartItems: [.init(id: 1, cartId: 2, productId: 3, quantity: 4, product: .empty)]
     )
     let matcher: (AddToCartDTO) -> Bool = {

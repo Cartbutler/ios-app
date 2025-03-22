@@ -13,10 +13,11 @@ struct AddToCartDTO: Encodable {
   let quantity: Int
 }
 
-struct CartDTO: Decodable, Hashable {
+struct CartDTO: Decodable, Hashable, Identifiable {
+  let id: Int
   let cartItems: [CartItemDTO]
 
-  static let empty = CartDTO(cartItems: [])
+  static let empty = CartDTO(id: 0, cartItems: [])
 
   var isEmpty: Bool { cartItems.isEmpty }
 }

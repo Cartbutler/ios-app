@@ -26,6 +26,7 @@ struct CartRepositoryTests {
   func refreshCartSuccess() async throws {
     // Given
     let expectedResponse = CartDTO(
+      id: 1,
       cartItems: [.init(id: 1, cartId: 2, productId: 3, quantity: 4, product: .empty)]
     )
 
@@ -61,6 +62,7 @@ struct CartRepositoryTests {
   func incrementSuccess() async throws {
     // Given
     let expectedResponse = CartDTO(
+      id: 1,
       cartItems: [.init(id: 1, cartId: 2, productId: 3, quantity: 1, product: .empty)]
     )
     given(mockAPIService)
@@ -94,15 +96,16 @@ struct CartRepositoryTests {
   @Test
   func decrementSuccess() async throws {
     // Given
-    let incrementResponse = CartDTO(cartItems: [
-      .init(id: 1, cartId: 2, productId: 3, quantity: 1, product: .empty)
-    ])
+    let incrementResponse = CartDTO(
+      id: 1,
+      cartItems: [.init(id: 1, cartId: 2, productId: 3, quantity: 1, product: .empty)]
+    )
     given(mockAPIService)
       .addToCart(productId: .value(3), quantity: .value(1))
       .willReturn(incrementResponse)
     try await sut.increment(productId: 3)
 
-    let expectedDecrementResponse = CartDTO(cartItems: [])
+    let expectedDecrementResponse = CartDTO.empty
     given(mockAPIService)
       .addToCart(productId: .value(3), quantity: .value(0))
       .willReturn(expectedDecrementResponse)
@@ -118,9 +121,10 @@ struct CartRepositoryTests {
   @Test
   func decrementFailure() async throws {
     // Given
-    let incrementResponse = CartDTO(cartItems: [
-      .init(id: 1, cartId: 2, productId: 3, quantity: 1, product: .empty)
-    ])
+    let incrementResponse = CartDTO(
+      id: 1,
+      cartItems: [.init(id: 1, cartId: 2, productId: 3, quantity: 1, product: .empty)]
+    )
     given(mockAPIService)
       .addToCart(productId: .value(3), quantity: .value(1))
       .willReturn(incrementResponse)
@@ -142,9 +146,10 @@ struct CartRepositoryTests {
   @Test
   func removeFromCartSuccess() async throws {
     // Given
-    let initialCart = CartDTO(cartItems: [
-      .init(id: 1, cartId: 2, productId: 3, quantity: 2, product: .empty)
-    ])
+    let initialCart = CartDTO(
+      id: 1,
+      cartItems: [.init(id: 1, cartId: 2, productId: 3, quantity: 2, product: .empty)]
+    )
     given(mockAPIService)
       .fetchCart()
       .willReturn(initialCart)
@@ -152,7 +157,7 @@ struct CartRepositoryTests {
     let currentCart = try await sut.cartPublisher.values.first()
     #expect(currentCart == initialCart)
 
-    let expectedResponse = CartDTO(cartItems: [])
+    let expectedResponse = CartDTO.empty
     given(mockAPIService)
       .addToCart(productId: .value(3), quantity: .value(0))
       .willReturn(expectedResponse)
@@ -185,6 +190,7 @@ struct CartRepositoryTests {
   func subsequentIncrementCallShouldDebounce() async throws {
     // Given
     let expectedResponse = CartDTO(
+      id: 1,
       cartItems: [.init(id: 1, cartId: 2, productId: 4, quantity: 3, product: .empty)]
     )
     given(mockAPIService)
@@ -206,6 +212,7 @@ struct CartRepositoryTests {
   func subsequentDecrementCallShouldDebounce() async throws {
     // Given
     let expectedResponse = CartDTO(
+      id: 1,
       cartItems: [.init(id: 1, cartId: 2, productId: 4, quantity: 1, product: .empty)]
     )
     given(mockAPIService)

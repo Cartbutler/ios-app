@@ -18,9 +18,10 @@ struct CartViewModelTests {
   private let mockCartRepository = MockCartRepositoryProvider()
   private let mockCartSubject = PassthroughSubject<CartDTO, Never>()
   private let sut: CartViewModel
-  private let mockCart = CartDTO(cartItems: [
-    .init(id: 1, cartId: 1, productId: 1, quantity: 2, product: .empty)
-  ])
+  private let mockCart = CartDTO(
+    id: 1,
+    cartItems: [.init(id: 1, cartId: 1, productId: 1, quantity: 2, product: .empty)]
+  )
 
   init() {
     sut = CartViewModel(cartRepository: mockCartRepository)
@@ -143,11 +144,13 @@ struct CartViewModelTests {
   func removeItemsFromIndexSetSuccess() async throws {
     // Given
     sut.viewDidAppear()
-    let mockCartWithMultipleItems = CartDTO(cartItems: [
-      .init(id: 1, cartId: 1, productId: 10, quantity: 2, product: .empty),
-      .init(id: 2, cartId: 1, productId: 20, quantity: 1, product: .empty),
-      .init(id: 3, cartId: 1, productId: 30, quantity: 3, product: .empty),
-    ])
+    let mockCartWithMultipleItems = CartDTO(
+      id: 1,
+      cartItems: [
+        .init(id: 1, cartId: 1, productId: 10, quantity: 2, product: .empty),
+        .init(id: 2, cartId: 1, productId: 20, quantity: 1, product: .empty),
+        .init(id: 3, cartId: 1, productId: 30, quantity: 3, product: .empty),
+      ])
     mockCartSubject.send(mockCartWithMultipleItems)
     let currentCart = await sut.$cart.values.first { !$0.isEmpty }
     #expect(currentCart?.cartItems.count == 3)
@@ -177,10 +180,12 @@ struct CartViewModelTests {
   func removeItemsFromIndexSetFailure() async throws {
     // Given
     sut.viewDidAppear()
-    let mockCartWithMultipleItems = CartDTO(cartItems: [
-      .init(id: 1, cartId: 1, productId: 10, quantity: 2, product: .empty),
-      .init(id: 2, cartId: 1, productId: 20, quantity: 1, product: .empty),
-    ])
+    let mockCartWithMultipleItems = CartDTO(
+      id: 1,
+      cartItems: [
+        .init(id: 1, cartId: 1, productId: 10, quantity: 2, product: .empty),
+        .init(id: 2, cartId: 1, productId: 20, quantity: 1, product: .empty),
+      ])
     mockCartSubject.send(mockCartWithMultipleItems)
     let currentCart = await sut.$cart.values.first { !$0.isEmpty }
     #expect(currentCart?.cartItems.count == 2)
@@ -204,9 +209,10 @@ struct CartViewModelTests {
   func removeItemsFromIndexSetWithInvalidIndices() async throws {
     // Given
     sut.viewDidAppear()
-    let mockCartWithMultipleItems = CartDTO(cartItems: [
-      .init(id: 1, cartId: 1, productId: 10, quantity: 2, product: .empty)
-    ])
+    let mockCartWithMultipleItems = CartDTO(
+      id: 1,
+      cartItems: [.init(id: 1, cartId: 1, productId: 10, quantity: 2, product: .empty)]
+    )
     mockCartSubject.send(mockCartWithMultipleItems)
     let currentCart = await sut.$cart.values.first { !$0.isEmpty }
     #expect(currentCart?.cartItems.count == 1)

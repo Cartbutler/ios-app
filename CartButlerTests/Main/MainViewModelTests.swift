@@ -27,6 +27,7 @@ struct MainViewModelTests {
     // Given
     let cartSubject = PassthroughSubject<CartDTO, Never>()
     let expectedResponse = CartDTO(
+      id: 1,
       cartItems: [.init(id: 1, cartId: 2, productId: 3, quantity: 4, product: .empty)]
     )
     given(mockCartRepository)

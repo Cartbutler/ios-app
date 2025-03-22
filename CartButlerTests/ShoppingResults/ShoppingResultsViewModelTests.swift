@@ -20,6 +20,7 @@ struct ShoppingResultsViewModelTests {
   private let sut: ShoppingResultsViewModel
 
   private let cartDTO = CartDTO(
+    id: 1,
     cartItems: [.init(id: 1, cartId: 1, productId: 3, quantity: 4, product: .empty)]
   )
 

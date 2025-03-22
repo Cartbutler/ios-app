@@ -34,8 +34,7 @@ final class ShoppingResultsViewModel: ObservableObject {
     errorMessage = nil
 
     do {
-      if let cartId = try await cartRepository.cartPublisher.values.first()?.cartItems.first?.cartId
-      {
+      if let cartId = try await cartRepository.cartPublisher.values.first()?.id {
         let allResults = try await apiService.fetchShoppingResults(cartId: cartId)
         if !allResults.isEmpty {
           cheapestResult = allResults.first
