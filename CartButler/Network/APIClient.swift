@@ -72,7 +72,7 @@ final class APIClient: APIClientProvider {
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     decoder.dateDecodingStrategy = .formatted(dateFormatter)
     encoder = JSONEncoder()
-    //    encoder.keyEncodingStrategy = .convertToSnakeCase
+    encoder.keyEncodingStrategy = .convertToSnakeCase
     encoder.dateEncodingStrategy = .formatted(dateFormatter)
   }
 
@@ -146,6 +146,7 @@ final class APIClient: APIClientProvider {
     do {
       (data, response) = try await session.data(for: request)
     } catch {
+      print(error)
       throw NetworkError.requestFailed(error)
     }
 
@@ -157,12 +158,14 @@ final class APIClient: APIClientProvider {
       let userInfo = String(data: data, encoding: .utf8).flatMap { ["response": $0] }
       let error = NSError(
         domain: "Network error", code: httpResponse.statusCode, userInfo: userInfo)
+      print(error)
       throw NetworkError.badStatusCode(error)
     }
 
     do {
       return try decoder.decode(T.self, from: data)
     } catch {
+      print(error)
       throw NetworkError.decodingError(error)
     }
   }

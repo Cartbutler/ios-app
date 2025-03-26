@@ -12,7 +12,7 @@ struct ProductDTO: Decodable, Hashable, Identifiable {
   let productId: Int
   let productName: String
   let description: String
-  let price: Double
+  let price: Double?
   let stock: Int
   let categoryId: Int
   let imagePath: String
@@ -23,14 +23,7 @@ struct ProductDTO: Decodable, Hashable, Identifiable {
   let maxPrice: Double?
 
   var formattedPrice: String {
-    if let minPrice = minPrice,
-      let maxPrice = maxPrice,
-      minPrice < maxPrice
-    {
-      "\(Formatter.currency(from: minPrice)) - \(Formatter.currency(from: maxPrice))"
-    } else {
-      Formatter.currency(from: price)
-    }
+    Formatter.currency(from: minPrice, to: maxPrice)
   }
 }
 
@@ -41,15 +34,4 @@ struct StoreDTO: Decodable, Hashable, Identifiable {
   let stock: Int
   let storeName: String
   let storeLocation: String
-}
-
-enum Formatter {
-  static let currencyFormatter: NumberFormatter = {
-    let formatter = NumberFormatter()
-    formatter.numberStyle = .currency
-    return formatter
-  }()
-  static func currency(from value: Double) -> String {
-    currencyFormatter.string(from: NSNumber(value: value)) ?? ""
-  }
 }

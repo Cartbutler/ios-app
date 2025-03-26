@@ -26,7 +26,7 @@ final class MainViewModel: ObservableObject {
     cartRepository.cartPublisher
       .receive(on: DispatchQueue.main)
       .sink { [weak self] cart in
-        self?.cartCount = cart.cartItems.count
+        self?.cartCount = cart?.cartItems.count ?? 0
       }
       .store(in: &cancellables)
 

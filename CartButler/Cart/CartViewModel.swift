@@ -10,7 +10,7 @@ import Foundation
 
 @MainActor
 final class CartViewModel: ObservableObject {
-  @Published var cart: CartDTO = .empty
+  @Published var cart: CartDTO?
   @Published var errorMessage: String?
   @Published var showAlert = false
 
@@ -48,6 +48,7 @@ final class CartViewModel: ObservableObject {
   }
 
   func removeItemsFromIndexSet(_ indexSet: IndexSet) async {
+    guard let cart else { return }
     let productIds: [Int] = indexSet.compactMap { index in
       guard index < cart.cartItems.count else { return nil }
       return cart.cartItems[index].productId

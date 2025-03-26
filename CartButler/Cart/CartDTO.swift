@@ -17,8 +17,6 @@ struct CartDTO: Decodable, Hashable, Identifiable {
   let id: Int
   let cartItems: [CartItemDTO]
 
-  static let empty = CartDTO(id: 0, cartItems: [])
-
   var isEmpty: Bool { cartItems.isEmpty }
 }
 

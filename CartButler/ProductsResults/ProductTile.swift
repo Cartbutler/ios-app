@@ -36,7 +36,7 @@ struct ProductTile: View {
           Text(product.productName)
             .font(.headline)
             .foregroundColor(.onSurface)
-          Text(Formatter.currency(from: product.price))
+          Text(Formatter.currency(from: product.minPrice, to: product.maxPrice))
             .font(.subheadline)
             .foregroundColor(.onSurface)
           Spacer()
@@ -52,7 +52,9 @@ struct ProductTile: View {
   ProductTile(
     product: BasicProductDTO(
       productId: 1,
-      productName: "Product 1", price: 10.0,
+      productName: "Product 1",
+      minPrice: 1.99,
+      maxPrice: 2.99,
       imagePath: "https://storage.googleapis.com/southern-shard-449119-d4.appspot.com/Apple.png")
   )
   .frame(width: 200, height: 200)

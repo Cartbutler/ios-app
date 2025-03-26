@@ -17,7 +17,8 @@ struct ProductsResultsViewModelTests {
   private let basicProductDTO = BasicProductDTO(
     productId: 1,
     productName: "product",
-    price: 4.99,
+    minPrice: 4.99,
+    maxPrice: 5.99,
     imagePath: ""
   )
 

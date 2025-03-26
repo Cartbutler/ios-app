@@ -96,7 +96,7 @@ struct ProductDetailsView: View {
         .font(.headline)
         .fontWeight(.semibold)
       Spacer()
-      Text(Formatter.currency(from: store.price))
+      Text(Formatter.currency(with: store.price))
         .font(.subheadline)
     }
   }

@@ -14,15 +14,15 @@ struct CartView: View {
     NavigationStack {
       withAnimation {
         Group {
-          if viewModel.cart.isEmpty {
-            emptyCartView
-          } else {
+          if let cart = viewModel.cart {
             VStack {
-              cartItemsList
+              cartItemsList(with: cart.cartItems)
               Spacer()
               shoppingResultsButton
                 .padding(.bottom, 8)
             }
+          } else {
+            emptyCartView
           }
         }
       }
@@ -51,9 +51,9 @@ struct CartView: View {
     }
   }
 
-  private var cartItemsList: some View {
+  private func cartItemsList(with cartItems: [CartItemDTO]) -> some View {
     List {
-      ForEach(viewModel.cart.cartItems) { item in
+      ForEach(cartItems) { item in
         CartItemRow(
           item: item,
           onIncrement: {
