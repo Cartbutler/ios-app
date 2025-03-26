@@ -53,7 +53,7 @@ final class APIService: APIServiceProvider {
   }
 
   func fetchProducts(categoryID: Int) async throws -> [BasicProductDTO] {
-    try await apiClient.get(path: "search", queryParameters: ["categoryID": String(categoryID)])
+    try await apiClient.get(path: "search", queryParameters: ["category_id": String(categoryID)])
   }
 
   func fetchProduct(id: Int) async throws -> ProductDTO {
@@ -61,7 +61,7 @@ final class APIService: APIServiceProvider {
   }
 
   func fetchCart() async throws -> CartDTO {
-    try await apiClient.get(path: "cart", queryParameters: ["userId": sessionID])
+    try await apiClient.get(path: "cart", queryParameters: ["user_id": sessionID])
   }
 
   func addToCart(productId: Int, quantity: Int) async throws -> CartDTO {
@@ -74,7 +74,7 @@ final class APIService: APIServiceProvider {
   func fetchShoppingResults(cartId: Int) async throws -> [ShoppingResultsDTO] {
     try await apiClient.get(
       path: "shopping-results",
-      queryParameters: ["cartId": String(cartId), "userId": sessionID]
+      queryParameters: ["cart_id": String(cartId), "user_id": sessionID]
     )
   }
 }

@@ -114,7 +114,7 @@ struct ShoppingResultsView: View {
       }
       Spacer()
       VStack(alignment: .trailing) {
-        Text(Formatter.currency(from: result.total))
+        Text(Formatter.currency(with: result.total))
           .font(style.priceFont)
           .fontWeight(.bold)
         Text("\(result.products.count) items")

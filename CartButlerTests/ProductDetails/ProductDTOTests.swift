@@ -26,11 +26,11 @@ struct ProductDTOTests {
   @Test
   func formattedPriceWithoutRange() {
     // Given
-    let product = buildProduct(price: 4.99, minPrice: nil, maxPrice: nil)
+    let product = buildProduct(price: nil, minPrice: nil, maxPrice: nil)
     // When
     let result = product.formattedPrice
     // Then
-    #expect(result == "$4.99")
+    #expect(result == "")
   }
 
   @Test
@@ -40,7 +40,7 @@ struct ProductDTOTests {
     // When
     let result = product.formattedPrice
     // Then
-    #expect(result == "$4.99")
+    #expect(result == "$3.99")
   }
 
   @Test
@@ -60,12 +60,14 @@ struct ProductDTOTests {
     // When
     let result = product.formattedPrice
     // Then
-    #expect(result == "$4.99")
+    // We should expect to see an inverted range if this happens,
+    // and fix on the backend
+    #expect(result == "$5.99 - $3.99")
   }
 
   // MARK: - Helpers
 
-  private func buildProduct(price: Double, minPrice: Double?, maxPrice: Double?) -> ProductDTO {
+  private func buildProduct(price: Double?, minPrice: Double?, maxPrice: Double?) -> ProductDTO {
     ProductDTO(
       productId: 1,
       productName: "product",

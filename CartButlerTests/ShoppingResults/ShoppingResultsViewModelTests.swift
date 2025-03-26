@@ -16,7 +16,7 @@ import Testing
 struct ShoppingResultsViewModelTests {
   private let mockAPIService = MockAPIServiceProvider()
   private let mockCartRepository = MockCartRepositoryProvider()
-  private let mockCartSubject: CurrentValueSubject<CartDTO, Never>
+  private let mockCartSubject: CurrentValueSubject<CartDTO?, Never>
   private let sut: ShoppingResultsViewModel
 
   private let cartDTO = CartDTO(
@@ -59,7 +59,7 @@ struct ShoppingResultsViewModelTests {
     )
     sortedShoppingResults = [cheapestResult, otherResult1, otherResult2]
     otherResults = [otherResult1, otherResult2]
-    mockCartSubject = CurrentValueSubject<CartDTO, Never>(cartDTO)
+    mockCartSubject = CurrentValueSubject<CartDTO?, Never>(cartDTO)
     given(mockCartRepository)
       .cartPublisher
       .willReturn(mockCartSubject.eraseToAnyPublisher())
@@ -139,7 +139,7 @@ struct ShoppingResultsViewModelTests {
   @Test
   func fetchResultsFailureWithEmptyCart() async throws {
     // Given
-    mockCartSubject.send(CartDTO.empty)
+    mockCartSubject.send(nil)
     #expect(sut.errorMessage == nil)
     #expect(sut.showAlert == false)
     #expect(sut.cheapestResult == nil)

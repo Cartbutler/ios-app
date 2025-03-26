@@ -36,7 +36,7 @@ struct CartRepositoryTests {
 
     // When
     try await sut.refreshCart()
-    let result = await sut.cartPublisher.values.first(where: { !$0.isEmpty })
+    let result = await sut.cartPublisher.values.first(where: { $0?.isEmpty == false })
 
     // Then
     #expect(result == expectedResponse)
@@ -73,7 +73,7 @@ struct CartRepositoryTests {
     try await sut.increment(productId: 3)
 
     // Then
-    let result = await sut.cartPublisher.values.first(where: { !$0.isEmpty })
+    let result = await sut.cartPublisher.values.first(where: { $0?.isEmpty == false })
     #expect(result == expectedResponse)
   }
 
@@ -105,7 +105,7 @@ struct CartRepositoryTests {
       .willReturn(incrementResponse)
     try await sut.increment(productId: 3)
 
-    let expectedDecrementResponse = CartDTO.empty
+    let expectedDecrementResponse = CartDTO(id: 1, cartItems: [])
     given(mockAPIService)
       .addToCart(productId: .value(3), quantity: .value(0))
       .willReturn(expectedDecrementResponse)
@@ -114,7 +114,7 @@ struct CartRepositoryTests {
     try await sut.decrement(productId: 3)
 
     // Then
-    let result = await sut.cartPublisher.values.first(where: { $0.isEmpty })
+    let result = await sut.cartPublisher.values.first(where: { $0?.isEmpty == true })
     #expect(result == expectedDecrementResponse)
   }
 
@@ -157,7 +157,7 @@ struct CartRepositoryTests {
     let currentCart = try await sut.cartPublisher.values.first()
     #expect(currentCart == initialCart)
 
-    let expectedResponse = CartDTO.empty
+    let expectedResponse = CartDTO(id: 1, cartItems: [])
     given(mockAPIService)
       .addToCart(productId: .value(3), quantity: .value(0))
       .willReturn(expectedResponse)
@@ -166,7 +166,7 @@ struct CartRepositoryTests {
     try await sut.removeFromCart(productId: 3)
 
     // Then
-    let result = await sut.cartPublisher.values.first(where: { $0.isEmpty })
+    let result = await sut.cartPublisher.values.first(where: { $0?.isEmpty == true })
     #expect(result == expectedResponse)
   }
 
@@ -226,7 +226,7 @@ struct CartRepositoryTests {
     _ = try await (task1, task2, task3)
 
     // Then
-    let result = await sut.cartPublisher.values.first(where: { !$0.isEmpty })
+    let result = await sut.cartPublisher.values.first(where: { $0?.isEmpty == false })
     #expect(result == expectedResponse)
   }
 }

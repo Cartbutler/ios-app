@@ -15,7 +15,7 @@ actor CartActor: GlobalActor {
 
 @Mockable
 protocol CartRepositoryProvider: Sendable {
-  var cartPublisher: AnyPublisher<CartDTO, Never> { get }
+  var cartPublisher: AnyPublisher<CartDTO?, Never> { get }
   func refreshCart() async throws
   func increment(productId: Int) async throws
   func decrement(productId: Int) async throws
@@ -26,9 +26,9 @@ final class CartRepository: CartRepositoryProvider, @unchecked Sendable {
 
   static let shared = CartRepository()
 
-  @CartActor @Published private var cart = CartDTO.empty
+  @CartActor @Published private var cart: CartDTO?
 
-  var cartPublisher: AnyPublisher<CartDTO, Never> {
+  var cartPublisher: AnyPublisher<CartDTO?, Never> {
     $cart.eraseToAnyPublisher()
   }
 
@@ -88,7 +88,7 @@ final class CartRepository: CartRepositoryProvider, @unchecked Sendable {
       // Increment the quantity based on temp items first.
       // If no temp item exists, get the item from the current cart.
       // If the item is not in the cart, default to 0.
-      let itemFromCart = cart.cartItems.first { $0.productId == productId }
+      let itemFromCart = cart?.cartItems.first { $0.productId == productId }
       tempItems[productId] = (tempItems[productId] ?? itemFromCart?.quantity ?? 0) + increment
       guard let quantity = tempItems[productId], quantity >= 0 else { return }
 

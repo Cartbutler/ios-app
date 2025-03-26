@@ -18,7 +18,8 @@ struct APIServiceTests {
   private let basicProductDTO = BasicProductDTO(
     productId: 1,
     productName: "product",
-    price: 4.99,
+    minPrice: 4.99,
+    maxPrice: 5.99,
     imagePath: ""
   )
   private let productDTO = ProductDTO(
@@ -148,7 +149,7 @@ struct APIServiceTests {
     // Given
     let expectedResponse = [basicProductDTO]
     given(mockAPIClient)
-      .get(path: .value("search"), queryParameters: .value(["categoryID": "1"]))
+      .get(path: .value("search"), queryParameters: .value(["category_id": "1"]))
       .willReturn(expectedResponse)
 
     // When
@@ -216,7 +217,7 @@ struct APIServiceTests {
       cartItems: [.init(id: 1, cartId: 2, productId: 3, quantity: 4, product: .empty)]
     )
     given(mockAPIClient)
-      .get(path: .value("cart"), queryParameters: .matching { $0?["userId"] != nil })
+      .get(path: .value("cart"), queryParameters: .matching { $0?["user_id"] != nil })
       .willReturn(expectedResponse)
 
     // When
@@ -301,7 +302,7 @@ struct APIServiceTests {
       )
     ]
     let matcher: ([String: String]?) -> Bool = {
-      $0?["cartId"] == "123" && $0?["userId"] != nil
+      $0?["cart_id"] == "123" && $0?["user_id"] != nil
     }
     given(mockAPIClient)
       .get(path: .value("shopping-results"), queryParameters: .matching(matcher))

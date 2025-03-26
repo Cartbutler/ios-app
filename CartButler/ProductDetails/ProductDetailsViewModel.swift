@@ -42,17 +42,6 @@ final class ProductDetailsViewModel: ObservableObject {
     isLoading = false
   }
 
-  func formattedPrice(from product: ProductDTO) -> String {
-    if let minPrice = product.minPrice,
-      let maxPrice = product.maxPrice,
-      minPrice < maxPrice
-    {
-      "\(Formatter.currency(from: minPrice)) - \(Formatter.currency(from: maxPrice))"
-    } else {
-      Formatter.currency(from: product.price)
-    }
-  }
-
   func addToCart() async {
     do {
       try await cartRepository.increment(productId: productID)

@@ -16,7 +16,7 @@ import Testing
 struct CartViewModelTests {
 
   private let mockCartRepository = MockCartRepositoryProvider()
-  private let mockCartSubject = PassthroughSubject<CartDTO, Never>()
+  private let mockCartSubject = PassthroughSubject<CartDTO?, Never>()
   private let sut: CartViewModel
   private let mockCart = CartDTO(
     id: 1,
@@ -41,14 +41,14 @@ struct CartViewModelTests {
   @Test
   func viewDidAppearShouldSubscribeToCartUpdates() async throws {
     // Given
-    #expect(sut.cart.cartItems.isEmpty)
+    #expect(sut.cart == nil)
     sut.viewDidAppear()
 
     // When
     mockCartSubject.send(mockCart)
 
     // Then
-    let result = await sut.$cart.values.first(where: { !$0.isEmpty })
+    let result = await sut.$cart.values.first(where: { $0?.isEmpty == false })
     #expect(result == mockCart)
   }
 
@@ -152,8 +152,8 @@ struct CartViewModelTests {
         .init(id: 3, cartId: 1, productId: 30, quantity: 3, product: .empty),
       ])
     mockCartSubject.send(mockCartWithMultipleItems)
-    let currentCart = await sut.$cart.values.first { !$0.isEmpty }
-    #expect(currentCart?.cartItems.count == 3)
+    let currentCart = await sut.$cart.values.first { $0?.isEmpty == false }
+    #expect(currentCart??.cartItems.count == 3)
 
     given(mockCartRepository)
       .removeFromCart(productId: .any)
@@ -187,8 +187,8 @@ struct CartViewModelTests {
         .init(id: 2, cartId: 1, productId: 20, quantity: 1, product: .empty),
       ])
     mockCartSubject.send(mockCartWithMultipleItems)
-    let currentCart = await sut.$cart.values.first { !$0.isEmpty }
-    #expect(currentCart?.cartItems.count == 2)
+    let currentCart = await sut.$cart.values.first { $0?.isEmpty == false }
+    #expect(currentCart??.cartItems.count == 2)
 
     given(mockCartRepository)
       .removeFromCart(productId: .any)
@@ -214,8 +214,8 @@ struct CartViewModelTests {
       cartItems: [.init(id: 1, cartId: 1, productId: 10, quantity: 2, product: .empty)]
     )
     mockCartSubject.send(mockCartWithMultipleItems)
-    let currentCart = await sut.$cart.values.first { !$0.isEmpty }
-    #expect(currentCart?.cartItems.count == 1)
+    let currentCart = await sut.$cart.values.first { $0?.isEmpty == false }
+    #expect(currentCart??.cartItems.count == 1)
 
     // When
     await sut.removeItemsFromIndexSet(IndexSet([1, 2]))  // Invalid indices
