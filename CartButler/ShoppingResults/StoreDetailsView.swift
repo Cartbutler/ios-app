@@ -22,15 +22,9 @@ struct StoreDetailsView: View {
 
   private var storeHeader: some View {
     VStack {
-      Image(systemName: "photo.circle.fill")
-        .resizable()
-        .frame(width: 80, height: 80)
-      Text(result.storeName)
-        .font(.title)
-        .fontWeight(.bold)
-        .foregroundStyle(.primaryVariant)
+      AsyncImageView(imagePath: result.storeImage)
+        .frame(width: 200)
         .padding(.bottom)
-
       HStack(alignment: .bottom) {
         Text("\(result.products.count) items")
           .font(.subheadline)

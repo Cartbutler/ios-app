@@ -11,11 +11,13 @@ struct ShoppingResultsDTO: Codable, Hashable, Identifiable {
   let storeId: Int
   let storeName: String
   let storeLocation: String
+  let storeImage: String
   let products: [ProductDTO]
   let total: Double
 
   struct ProductDTO: Codable, Hashable, Identifiable {
-    let id = UUID().uuidString
+    var id: Int { productId }
+    let productId: Int
     let productName: String
     let price: Double
     let quantity: Int
