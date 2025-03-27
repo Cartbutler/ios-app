@@ -214,6 +214,16 @@
         }
       }
     },
+    "Quantity: %lld" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quantidade: %lld"
+          }
+        }
+      }
+    },
     "Retry" : {
       "localizations" : {
         "pt-BR" : {

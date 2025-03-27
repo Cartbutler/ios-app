@@ -28,6 +28,7 @@ struct ShoppingResultsViewModelTests {
     storeId: 1,
     storeName: "Cheapest Store",
     storeLocation: "Location 1",
+    storeImage: "",
     products: [],
     total: 10.99
   )
@@ -36,6 +37,7 @@ struct ShoppingResultsViewModelTests {
     storeId: 2,
     storeName: "Medium Store",
     storeLocation: "Location 2",
+    storeImage: "",
     products: [],
     total: 12.99
   )
@@ -45,6 +47,7 @@ struct ShoppingResultsViewModelTests {
       storeId: 3,
       storeName: "Expensive Store",
       storeLocation: "Location 3",
+      storeImage: "",
       products: [],
       total: 15.99
     )

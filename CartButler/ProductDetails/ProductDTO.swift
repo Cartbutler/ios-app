@@ -34,4 +34,5 @@ struct StoreDTO: Decodable, Hashable, Identifiable {
   let stock: Int
   let storeName: String
   let storeLocation: String
+  let storeImage: String
 }

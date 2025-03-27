@@ -100,9 +100,15 @@ struct ShoppingResultsView: View {
   }
 
   private func storeRow(result: ShoppingResultsDTO, style: StoreRowStyle = .others) -> some View {
+    NavigationLink(destination: StoreDetailsView(result: result)) {
+      storeCard(result: result, style: style)
+    }
+    .buttonStyle(.plain)
+  }
+
+  private func storeCard(result: ShoppingResultsDTO, style: StoreRowStyle = .others) -> some View {
     HStack {
-      Image(systemName: "photo.circle.fill")
-        .resizable()
+      AsyncImageView(imagePath: result.storeImage)
         .frame(width: style.imageSize, height: style.imageSize)
       VStack(alignment: .leading) {
         Text(result.storeName)

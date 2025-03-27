@@ -291,8 +291,10 @@ struct APIServiceTests {
         storeId: 1,
         storeName: "Test Store",
         storeLocation: "Test Location",
+        storeImage: "",
         products: [
           .init(
+            productId: 1,
             productName: "Test Product",
             price: 9.99,
             quantity: 2
