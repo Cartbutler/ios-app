@@ -74,7 +74,7 @@ struct ShoppingResultsViewModelTests {
   func fetchResultsShouldSetLoadingState() async throws {
     // Given
     given(mockAPIService)
-      .fetchShoppingResults(cartId: .any)
+      .fetchShoppingResults(cartId: .any, storeIds: .any, radius: .any, lat: .any, long: .any)
       .willReturn(sortedShoppingResults)
     #expect(sut.isLoading == false)
 
@@ -100,7 +100,13 @@ struct ShoppingResultsViewModelTests {
   func fetchResultsSuccess() async throws {
     // Given
     given(mockAPIService)
-      .fetchShoppingResults(cartId: .value(1))
+      .fetchShoppingResults(
+        cartId: .value(1),
+        storeIds: .value(nil),
+        radius: .value(nil),
+        lat: .value(nil),
+        long: .value(nil)
+      )
       .willReturn(sortedShoppingResults)
 
     #expect(sut.errorMessage == nil)
@@ -121,7 +127,7 @@ struct ShoppingResultsViewModelTests {
   func fetchResultsFailureWithNetworkError() async throws {
     // Given
     given(mockAPIService)
-      .fetchShoppingResults(cartId: .any)
+      .fetchShoppingResults(cartId: .any, storeIds: .any, radius: .any, lat: .any, long: .any)
       .willThrow(NetworkError.invalidResponse)
 
     #expect(sut.errorMessage == nil)
@@ -157,7 +163,7 @@ struct ShoppingResultsViewModelTests {
     #expect(sut.cheapestResult == nil)
     #expect(sut.otherResults == nil)
     verify(mockAPIService)
-      .fetchShoppingResults(cartId: .any)
+      .fetchShoppingResults(cartId: .any, storeIds: .any, radius: .any, lat: .any, long: .any)
       .called(0)
   }
 
@@ -165,7 +171,13 @@ struct ShoppingResultsViewModelTests {
   func fetchResultsShouldNotCallAPIIfAlreadyLoaded() async throws {
     // Given
     given(mockAPIService)
-      .fetchShoppingResults(cartId: .value(1))
+      .fetchShoppingResults(
+        cartId: .value(1),
+        storeIds: .value(nil),
+        radius: .value(nil),
+        lat: .value(nil),
+        long: .value(nil)
+      )
       .willReturn(sortedShoppingResults)
 
     // When
@@ -174,7 +186,13 @@ struct ShoppingResultsViewModelTests {
 
     // Then
     verify(mockAPIService)
-      .fetchShoppingResults(cartId: .value(1))
+      .fetchShoppingResults(
+        cartId: .value(1),
+        storeIds: .value(nil),
+        radius: .value(nil),
+        lat: .value(nil),
+        long: .value(nil)
+      )
       .called(1)  // Should only be called once
   }
 
@@ -182,7 +200,13 @@ struct ShoppingResultsViewModelTests {
   func fetchResultsShouldNotCallAPIIfLoading() async throws {
     // Given
     given(mockAPIService)
-      .fetchShoppingResults(cartId: .value(1))
+      .fetchShoppingResults(
+        cartId: .value(1),
+        storeIds: .value(nil),
+        radius: .value(nil),
+        lat: .value(nil),
+        long: .value(nil)
+      )
       .willReturn(sortedShoppingResults)
 
     // When
@@ -192,7 +216,13 @@ struct ShoppingResultsViewModelTests {
 
     // Then
     verify(mockAPIService)
-      .fetchShoppingResults(cartId: .value(1))
+      .fetchShoppingResults(
+        cartId: .value(1),
+        storeIds: .value(nil),
+        radius: .value(nil),
+        lat: .value(nil),
+        long: .value(nil)
+      )
       .called(1)  // Should only be called once
   }
 
@@ -202,7 +232,13 @@ struct ShoppingResultsViewModelTests {
   func fetchResultsShouldSeparateCheapestResult() async throws {
     // Given
     given(mockAPIService)
-      .fetchShoppingResults(cartId: .value(1))
+      .fetchShoppingResults(
+        cartId: .value(1),
+        storeIds: .value(nil),
+        radius: .value(nil),
+        lat: .value(nil),
+        long: .value(nil)
+      )
       .willReturn(sortedShoppingResults)
 
     #expect(sut.cheapestResult == nil)
@@ -224,7 +260,13 @@ struct ShoppingResultsViewModelTests {
     // Given
     let singleResult = [cheapestResult]
     given(mockAPIService)
-      .fetchShoppingResults(cartId: .value(1))
+      .fetchShoppingResults(
+        cartId: .value(1),
+        storeIds: .value(nil),
+        radius: .value(nil),
+        lat: .value(nil),
+        long: .value(nil)
+      )
       .willReturn(singleResult)
 
     // When
@@ -239,7 +281,13 @@ struct ShoppingResultsViewModelTests {
   func fetchResultsWithEmptyResultsShouldHaveNoResults() async throws {
     // Given
     given(mockAPIService)
-      .fetchShoppingResults(cartId: .value(1))
+      .fetchShoppingResults(
+        cartId: .value(1),
+        storeIds: .value(nil),
+        radius: .value(nil),
+        lat: .value(nil),
+        long: .value(nil)
+      )
       .willReturn([])
 
     // When
@@ -254,7 +302,7 @@ struct ShoppingResultsViewModelTests {
   func fetchResultsFailureShouldClearBothResults() async throws {
     // Given
     given(mockAPIService)
-      .fetchShoppingResults(cartId: .any)
+      .fetchShoppingResults(cartId: .any, storeIds: .any, radius: .any, lat: .any, long: .any)
       .willThrow(NetworkError.invalidResponse)
 
     #expect(sut.cheapestResult == nil)
