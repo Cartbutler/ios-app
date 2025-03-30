@@ -18,7 +18,17 @@ protocol APIServiceProvider: Sendable {
   func fetchProduct(id: Int) async throws -> ProductDTO
   func fetchCart() async throws -> CartDTO
   func addToCart(productId: Int, quantity: Int) async throws -> CartDTO
-  func fetchShoppingResults(cartId: Int) async throws -> [ShoppingResultsDTO]
+  func fetchShoppingResults(
+    cartId: Int, storeIds: [Int]?, radius: Double?, lat: Double?, long: Double?
+  ) async throws -> [ShoppingResultsDTO]
+}
+
+extension APIServiceProvider {
+  func fetchShoppingResults(cartId: Int) async throws -> [ShoppingResultsDTO] {
+    try await fetchShoppingResults(
+      cartId: cartId, storeIds: nil, radius: nil, lat: nil, long: nil
+    )
+  }
 }
 
 final class APIService: APIServiceProvider {
@@ -71,10 +81,17 @@ final class APIService: APIServiceProvider {
     )
   }
 
-  func fetchShoppingResults(cartId: Int) async throws -> [ShoppingResultsDTO] {
-    try await apiClient.get(
+  func fetchShoppingResults(
+    cartId: Int, storeIds: [Int]?, radius: Double?, lat: Double?, long: Double?
+  ) async throws -> [ShoppingResultsDTO] {
+    var queryParameters = try await ["cart_id": String(cartId), "user_id": sessionID]
+    queryParameters["store_ids"] = storeIds?.map(String.init).joined(separator: ",")
+    queryParameters["user_location"] = [lat, long].compactMap { $0 }.map { String($0) }.joined(
+      separator: ",")
+
+    return try await apiClient.get(
       path: "shopping-results",
-      queryParameters: ["cart_id": String(cartId), "user_id": sessionID]
+      queryParameters: queryParameters
     )
   }
 }

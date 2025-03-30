@@ -37,6 +37,22 @@ struct APIServiceTests {
     maxPrice: 5.99
   )
 
+  private let shoppingResultsDTO = ShoppingResultsDTO(
+    storeId: 1,
+    storeName: "Test Store",
+    storeLocation: "Test Location",
+    storeImage: "",
+    products: [
+      .init(
+        productId: 1,
+        productName: "Test Product",
+        price: 9.99,
+        quantity: 2
+      )
+    ],
+    total: 19.98
+  )
+
   init() {
     sut = APIService(apiClient: mockAPIClient)
   }
@@ -286,25 +302,14 @@ struct APIServiceTests {
   @Test
   func fetchShoppingResultsSuccess() async throws {
     // Given
-    let expectedResponse = [
-      ShoppingResultsDTO(
-        storeId: 1,
-        storeName: "Test Store",
-        storeLocation: "Test Location",
-        storeImage: "",
-        products: [
-          .init(
-            productId: 1,
-            productName: "Test Product",
-            price: 9.99,
-            quantity: 2
-          )
-        ],
-        total: 19.98
-      )
-    ]
+    let expectedResponse = [shoppingResultsDTO]
     let matcher: ([String: String]?) -> Bool = {
-      $0?["cart_id"] == "123" && $0?["user_id"] != nil
+      $0?["cart_id"] == "123"
+        && $0?["user_id"] != nil
+        && $0?["store_ids"] == nil
+        && $0?["radius"] == nil
+        && $0?["lat"] == nil
+        && $0?["long"] == nil
     }
     given(mockAPIClient)
       .get(path: .value("shopping-results"), queryParameters: .matching(matcher))
@@ -312,6 +317,33 @@ struct APIServiceTests {
 
     // When
     let result = try await sut.fetchShoppingResults(cartId: 123)
+
+    // Then
+    #expect(result == expectedResponse)
+  }
+
+  @Test
+  func fetchShoppingResultsWithFiltersSuccess() async throws {
+    // Given
+    let expectedResponse = [shoppingResultsDTO]
+    let matcher: ([String: String]?) -> Bool = {
+      $0?["cart_id"] == "123"
+        && $0?["user_id"] != nil
+        && $0?["store_ids"] == "1,2"
+        && $0?["user_location"] == "1.2,2.3"
+    }
+    given(mockAPIClient)
+      .get(path: .value("shopping-results"), queryParameters: .matching(matcher))
+      .willReturn(expectedResponse)
+
+    // When
+    let result = try await sut.fetchShoppingResults(
+      cartId: 123,
+      storeIds: [1, 2],
+      radius: 12.345,
+      lat: 1.2,
+      long: 2.3
+    )
 
     // Then
     #expect(result == expectedResponse)
