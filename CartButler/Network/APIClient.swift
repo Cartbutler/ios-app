@@ -58,10 +58,16 @@ final class APIClient: APIClientProvider {
   private let session: NetworkSession
   private let decoder: JSONDecoder
   private let encoder: JSONEncoder
+  private let languageService: LanguageServiceProvider
 
-  init(baseURL: URL = APIClient.defaulURL, session: NetworkSession = URLSession.shared) {
+  init(
+    baseURL: URL = APIClient.defaulURL,
+    session: NetworkSession = URLSession.shared,
+    languageService: LanguageServiceProvider = LanguageService.shared
+  ) {
     self.baseURL = baseURL
     self.session = session
+    self.languageService = languageService
 
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
@@ -122,8 +128,10 @@ final class APIClient: APIClientProvider {
       throw NetworkError.invalidURL
     }
 
-    if let queryParameters = queryParameters {
-      urlComponents.queryItems = queryParameters.map { URLQueryItem(name: $0.key, value: $0.value) }
+    var queryParameters = queryParameters ?? [:]
+    queryParameters["language_id"] = languageService.languageID
+    urlComponents.queryItems = queryParameters.map {
+      URLQueryItem(name: $0.key, value: $0.value)
     }
 
     guard let url = urlComponents.url else {

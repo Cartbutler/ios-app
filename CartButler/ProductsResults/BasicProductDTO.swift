@@ -11,7 +11,7 @@ struct BasicProductDTO: Decodable, Hashable, Identifiable {
 
   let productId: Int
   let productName: String
-  let minPrice: Double
-  let maxPrice: Double
+  let minPrice: Double?
+  let maxPrice: Double?
   let imagePath: String
 }

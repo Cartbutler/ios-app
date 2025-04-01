@@ -28,8 +28,9 @@ struct APIClientTests {
   }
 
   private let mockSession = MockNetworkSession()
+  private let mockLanguageService = MockLanguageServiceProvider()
   private let sut: APIClient
-  private let mockEndpointURL = URL(string: "https://example.com/api/test")!
+  private let mockEndpointURL = URL(string: "https://example.com/api/test?language_id=pt-BR")!
   private let requestBody = "{ \"message_id\": 1, \"message\": \"request\" }"
   private let successBody =
     """
@@ -43,8 +44,12 @@ struct APIClientTests {
   init() {
     sut = APIClient(
       baseURL: URL(string: "https://example.com/api")!,
-      session: mockSession
+      session: mockSession,
+      languageService: mockLanguageService
     )
+    given(mockLanguageService)
+      .languageID
+      .willReturn("pt-BR")
   }
 
   // MARK: - Successful responses
@@ -53,7 +58,7 @@ struct APIClientTests {
   func testGetRequestSuccess() async throws {
     // Given
     let parameters = ["key1": "value 1"]
-    let expectedURL = URL(string: "https://example.com/api/test?key1=value%201")!
+    let expectedURL = URL(string: "https://example.com/api/test?key1=value%201&language_id=pt-BR")!
     let expectedRequest = try buildURLRequest(url: expectedURL, method: "GET")
     given(mockSession)
       .data(for: .value(expectedRequest))
