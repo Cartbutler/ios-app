@@ -11,6 +11,7 @@ struct ShoppingResultsDTO: Codable, Hashable, Identifiable {
   let storeId: Int
   let storeName: String
   let storeLocation: String
+  let storeAddress: String
   let storeImage: String
   let products: [ProductDTO]
   let total: Double
