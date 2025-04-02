@@ -38,6 +38,7 @@ final class CategoryRepositoryImpl: CategoryRepository {
     Task {
       let context = container.newBackgroundContext()
       try context.transaction {
+        try context.delete(model: Category.self)
         categories.forEach { context.insert(Category(dto: $0)) }
       }
     }
