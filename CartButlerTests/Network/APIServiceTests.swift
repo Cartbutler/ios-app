@@ -41,6 +41,7 @@ struct APIServiceTests {
     storeId: 1,
     storeName: "Test Store",
     storeLocation: "Test Location",
+    storeAddress: "Test Address",
     storeImage: "",
     products: [
       .init(

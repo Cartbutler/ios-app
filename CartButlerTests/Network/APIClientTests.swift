@@ -58,7 +58,7 @@ struct APIClientTests {
   func testGetRequestSuccess() async throws {
     // Given
     let parameters = ["key1": "value 1"]
-    let expectedURL = URL(string: "https://example.com/api/test?key1=value%201&language_id=pt-BR")!
+    let expectedURL = URL(string: "https://example.com/api/test?language_id=pt-BR&key1=value%201")!
     let expectedRequest = try buildURLRequest(url: expectedURL, method: "GET")
     given(mockSession)
       .data(for: .value(expectedRequest))
