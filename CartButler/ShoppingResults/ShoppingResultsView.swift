@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ShoppingResultsView: View {
   @StateObject private var viewModel = ShoppingResultsViewModel()
+  @State private var isFilterSheetPresented = false
 
   var body: some View {
     Group {
@@ -19,9 +20,7 @@ struct ShoppingResultsView: View {
       } else if let cheapest = viewModel.cheapestResult {
         VStack(spacing: 16) {
           bestDealSection(cheapest)
-          if let others = viewModel.otherResults, !others.isEmpty {
-            otherResultsList(with: others)
-          }
+          otherResultsList
         }
       } else {
         emptyResultsView
@@ -30,6 +29,12 @@ struct ShoppingResultsView: View {
     .navigationTitle("Shopping Results")
     .foregroundStyle(.onBackground)
     .backgroundStyle(.themeBackground)
+    .toolbar { filterButton }
+    .sheet(isPresented: $isFilterSheetPresented) {
+      NavigationStack {
+        ShoppingResultsFilterView(results: viewModel.allResults)
+      }
+    }
     .alert(viewModel.errorMessage ?? "", isPresented: $viewModel.showAlert) {
       Button("OK") {
         viewModel.errorMessage = nil
@@ -62,6 +67,21 @@ struct ShoppingResultsView: View {
     }
   }
 
+  @ToolbarContentBuilder
+  private var filterButton: some ToolbarContent {
+    if !viewModel.isLoading {
+      ToolbarItem(placement: .topBarTrailing) {
+        Button {
+          isFilterSheetPresented = true
+        } label: {
+          Image(systemName: "line.3.horizontal.decrease")
+            .font(.title2)
+        }
+        .foregroundStyle(.onBackground)
+      }
+    }
+  }
+
   private func bestDealSection(_ result: ShoppingResultsDTO) -> some View {
     VStack(alignment: .leading, spacing: 12) {
       Text("Best Deal")
@@ -83,19 +103,22 @@ struct ShoppingResultsView: View {
     }
   }
 
-  private func otherResultsList(with results: [ShoppingResultsDTO]) -> some View {
-    VStack(alignment: .leading) {
-      Text("Other Options")
-        .font(.title3)
-        .fontWeight(.semibold)
-        .padding(.horizontal)
+  @ViewBuilder
+  private var otherResultsList: some View {
+    if !viewModel.otherResults.isEmpty {
+      VStack(alignment: .leading) {
+        Text("Other Options")
+          .font(.title3)
+          .fontWeight(.semibold)
+          .padding(.horizontal)
 
-      List {
-        ForEach(results) { result in
-          storeRow(result: result)
+        List {
+          ForEach(viewModel.otherResults) { result in
+            storeRow(result: result)
+          }
         }
+        .listStyle(.plain)
       }
-      .listStyle(.plain)
     }
   }
 

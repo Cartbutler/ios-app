@@ -9,8 +9,9 @@ import Foundation
 
 @MainActor
 final class ShoppingResultsViewModel: ObservableObject {
+  private(set) var allResults = [ShoppingResultsDTO]()
   @Published private(set) var cheapestResult: ShoppingResultsDTO?
-  @Published private(set) var otherResults: [ShoppingResultsDTO]?
+  @Published private(set) var otherResults = [ShoppingResultsDTO]()
   @Published private(set) var isLoading = false
   @Published var showAlert = false
   @Published var errorMessage: String? {
@@ -29,13 +30,13 @@ final class ShoppingResultsViewModel: ObservableObject {
   }
 
   func fetchResults() async {
-    guard !isLoading, otherResults == nil else { return }
+    guard !isLoading, cheapestResult == nil else { return }
     isLoading = true
     errorMessage = nil
 
     do {
       if let cartId = try await cartRepository.cartPublisher.values.first()??.id {
-        let allResults = try await apiService.fetchShoppingResults(cartId: cartId)
+        allResults = try await apiService.fetchShoppingResults(cartId: cartId)
         if !allResults.isEmpty {
           cheapestResult = allResults.first
           otherResults = Array(allResults.dropFirst())
