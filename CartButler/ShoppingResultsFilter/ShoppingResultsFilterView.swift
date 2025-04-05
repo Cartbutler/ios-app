@@ -86,8 +86,7 @@ struct ShoppingResultsFilterView: View {
     .padding(.horizontal)
   }
 
-  private func storeCheckbox(for store: ShoppingResultsFilterViewModel.StoreFilterDTO) -> some View
-  {
+  private func storeCheckbox(for store: StoreFilterDTO) -> some View {
     HStack {
       Button {
         viewModel.toggleStoreSelection(store.id)
@@ -96,7 +95,7 @@ struct ShoppingResultsFilterView: View {
           .font(.title3)
           .foregroundStyle(.secondaryVariant)
       }
-      
+
       AsyncImageView(imagePath: store.imagePath)
         .frame(width: 40, height: 40)
         .clipShape(RoundedRectangle(cornerRadius: 8))
