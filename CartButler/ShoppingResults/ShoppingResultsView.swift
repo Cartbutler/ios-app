@@ -80,9 +80,20 @@ struct ShoppingResultsView: View {
         } label: {
           Image(systemName: "line.3.horizontal.decrease")
             .font(.title2)
+            .overlay(alignment: .topTrailing) { filterBadge }
         }
         .foregroundStyle(.onBackground)
       }
+    }
+  }
+
+  @ViewBuilder
+  private var filterBadge: some View {
+    if viewModel.filterParameters != nil {
+      Circle()
+        .fill(Color.themePrimary)
+        .frame(width: 8, height: 8)
+        .offset(x: 4, y: -4)
     }
   }
 
