@@ -61,26 +61,6 @@
         }
       }
     },
-    "1km" : {
-      "localizations" : {
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1km"
-          }
-        }
-      }
-    },
-    "10km" : {
-      "localizations" : {
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "10km"
-          }
-        }
-      }
-    },
     "Account" : {
       "localizations" : {
         "pt-BR" : {

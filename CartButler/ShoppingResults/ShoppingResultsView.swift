@@ -32,7 +32,10 @@ struct ShoppingResultsView: View {
     .toolbar { filterButton }
     .sheet(isPresented: $isFilterSheetPresented) {
       NavigationStack {
-        ShoppingResultsFilterView(results: viewModel.allResults)
+        ShoppingResultsFilterView(
+          results: viewModel.allResults,
+          filterParameters: $viewModel.filterParameters
+        )
       }
     }
     .alert(viewModel.errorMessage ?? "", isPresented: $viewModel.showAlert) {

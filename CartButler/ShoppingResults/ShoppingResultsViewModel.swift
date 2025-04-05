@@ -17,6 +17,11 @@ final class ShoppingResultsViewModel: ObservableObject {
   @Published var errorMessage: String? {
     didSet { if errorMessage?.isEmpty == false { showAlert = true } }
   }
+  @Published var filterParameters: FilterParameters? {
+    didSet {
+      print("Filter parameters changed: \(filterParameters)")
+    }
+  }
 
   private let apiService: APIServiceProvider
   private let cartRepository: CartRepositoryProvider
