@@ -122,6 +122,7 @@ struct ShoppingResultsViewModelTests {
     // Then
     #expect(sut.errorMessage == nil)
     #expect(sut.showAlert == false)
+    #expect(sut.allResults == sortedShoppingResults)
     #expect(sut.cheapestResult == cheapestResult)
     #expect(sut.otherResults == otherResults)
   }
@@ -136,7 +137,7 @@ struct ShoppingResultsViewModelTests {
     #expect(sut.errorMessage == nil)
     #expect(sut.showAlert == false)
     #expect(sut.cheapestResult == nil)
-    #expect(sut.otherResults == nil)
+    #expect(sut.otherResults == [])
 
     // When
     await sut.fetchResults()
@@ -144,8 +145,9 @@ struct ShoppingResultsViewModelTests {
     // Then
     #expect(sut.errorMessage != nil)
     #expect(sut.showAlert == true)
+    #expect(sut.allResults == [])
     #expect(sut.cheapestResult == nil)
-    #expect(sut.otherResults == nil)
+    #expect(sut.otherResults == [])
   }
 
   @Test
@@ -155,7 +157,7 @@ struct ShoppingResultsViewModelTests {
     #expect(sut.errorMessage == nil)
     #expect(sut.showAlert == false)
     #expect(sut.cheapestResult == nil)
-    #expect(sut.otherResults == nil)
+    #expect(sut.otherResults == [])
 
     // When
     await sut.fetchResults()
@@ -163,8 +165,9 @@ struct ShoppingResultsViewModelTests {
     // Then
     #expect(sut.errorMessage == "No items in cart")
     #expect(sut.showAlert == true)
+    #expect(sut.allResults == [])
     #expect(sut.cheapestResult == nil)
-    #expect(sut.otherResults == nil)
+    #expect(sut.otherResults == [])
     verify(mockAPIService)
       .fetchShoppingResults(cartId: .any, storeIds: .any, radius: .any, lat: .any, long: .any)
       .called(0)
@@ -244,18 +247,20 @@ struct ShoppingResultsViewModelTests {
       )
       .willReturn(sortedShoppingResults)
 
+    #expect(sut.allResults == [])
     #expect(sut.cheapestResult == nil)
-    #expect(sut.otherResults == nil)
+    #expect(sut.otherResults == [])
 
     // When
     await sut.fetchResults()
 
     // Then
+    #expect(sut.allResults == sortedShoppingResults)
     #expect(sut.cheapestResult?.storeId == 1)
     #expect(sut.cheapestResult?.total == 10.99)
-    #expect(sut.otherResults?.count == 2)
-    #expect(sut.otherResults?.first?.storeId == 2)
-    #expect(sut.otherResults?.last?.storeId == 3)
+    #expect(sut.otherResults.count == 2)
+    #expect(sut.otherResults.first?.storeId == 2)
+    #expect(sut.otherResults.last?.storeId == 3)
   }
 
   @Test
@@ -276,6 +281,7 @@ struct ShoppingResultsViewModelTests {
     await sut.fetchResults()
 
     // Then
+    #expect(sut.allResults == singleResult)
     #expect(sut.cheapestResult?.storeId == 1)
     #expect(sut.otherResults == [])
   }
@@ -297,8 +303,9 @@ struct ShoppingResultsViewModelTests {
     await sut.fetchResults()
 
     // Then
+    #expect(sut.allResults == [])
     #expect(sut.cheapestResult == nil)
-    #expect(sut.otherResults == nil)
+    #expect(sut.otherResults == [])
   }
 
   @Test
@@ -308,15 +315,17 @@ struct ShoppingResultsViewModelTests {
       .fetchShoppingResults(cartId: .any, storeIds: .any, radius: .any, lat: .any, long: .any)
       .willThrow(NetworkError.invalidResponse)
 
+    #expect(sut.allResults == [])
     #expect(sut.cheapestResult == nil)
-    #expect(sut.otherResults == nil)
+    #expect(sut.otherResults == [])
 
     // When
     await sut.fetchResults()
 
     // Then
+    #expect(sut.allResults == [])
     #expect(sut.cheapestResult == nil)
-    #expect(sut.otherResults == nil)
+    #expect(sut.otherResults == [])
     #expect(sut.errorMessage != nil)
     #expect(sut.showAlert == true)
   }

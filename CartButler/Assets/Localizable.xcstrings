@@ -51,6 +51,36 @@
         }
       }
     },
+    "%lldkm" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lldkm"
+          }
+        }
+      }
+    },
+    "1km" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1km"
+          }
+        }
+      }
+    },
+    "10km" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10km"
+          }
+        }
+      }
+    },
     "Account" : {
       "localizations" : {
         "pt-BR" : {
@@ -67,6 +97,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adicionar ao carrinho"
+          }
+        }
+      }
+    },
+    "Apply Filters" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplicar Filtros"
           }
         }
       }
@@ -122,6 +162,16 @@
         }
       }
     },
+    "Distance" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Distância"
+          }
+        }
+      }
+    },
     "Failed to add product to cart, please try again." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -129,6 +179,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erro ao adicionar produto ao carrinho, por favor tente novamente."
+          }
+        }
+      }
+    },
+    "Filter Results" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtrar Resultados"
           }
         }
       }
