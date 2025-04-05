@@ -9,14 +9,23 @@ import Foundation
 
 @MainActor
 final class ShoppingResultsViewModel: ObservableObject {
-  private(set) var allResults = [ShoppingResultsDTO]()
-  @Published private(set) var cheapestResult: ShoppingResultsDTO?
-  @Published private(set) var otherResults = [ShoppingResultsDTO]()
-  @Published private(set) var isLoading = false
-  @Published var showAlert = false
-  @Published var errorMessage: String? {
-    didSet { if errorMessage?.isEmpty == false { showAlert = true } }
+
+  enum State: Equatable {
+    case idle
+    case empty
+    case loading
+    case loaded(ShoppingResultsDTO)
+    case error(String)
   }
+
+  private(set) var allResults = [ShoppingResultsDTO]()
+  @Published private(set) var otherResults = [ShoppingResultsDTO]()
+  @Published private(set) var state = State.idle {
+    didSet {
+      if case .error(let message) = state, !message.isEmpty { showAlert = true }
+    }
+  }
+  @Published var showAlert = false
   @Published var filterParameters: FilterParameters? {
     didSet {
       print("Filter parameters changed: \(filterParameters)")
@@ -35,24 +44,24 @@ final class ShoppingResultsViewModel: ObservableObject {
   }
 
   func fetchResults() async {
-    guard !isLoading, cheapestResult == nil else { return }
-    isLoading = true
-    errorMessage = nil
+    guard state == .idle else { return }
+    state = .loading
 
     do {
       if let cartId = try await cartRepository.cartPublisher.values.first()??.id {
         allResults = try await apiService.fetchShoppingResults(cartId: cartId)
-        if !allResults.isEmpty {
-          cheapestResult = allResults.first
+        if let cheapest = allResults.first {
+          state = .loaded(cheapest)
           otherResults = Array(allResults.dropFirst())
+        } else {
+          state = .empty
+          otherResults = []
         }
       } else {
-        errorMessage = "No items in cart"
+        state = .error("No items in cart")
       }
     } catch {
-      errorMessage = "Failed to load shopping results: \(error.localizedDescription)"
+      state = .error("Failed to load shopping results: \(error.localizedDescription)")
     }
-
-    isLoading = false
   }
 }

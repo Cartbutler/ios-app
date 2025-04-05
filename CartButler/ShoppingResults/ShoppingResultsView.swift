@@ -13,16 +13,22 @@ struct ShoppingResultsView: View {
 
   var body: some View {
     Group {
-      if viewModel.isLoading {
+      switch viewModel.state {
+      case .idle, .loading:
         loadingView
-      } else if let errorMessage = viewModel.errorMessage {
+      case .error(let errorMessage):
         errorView(message: errorMessage)
-      } else if let cheapest = viewModel.cheapestResult {
+          .alert(errorMessage, isPresented: $viewModel.showAlert) {
+            Button("OK") {
+              viewModel.showAlert = false
+            }
+          }
+      case .loaded(let cheapest):
         VStack(spacing: 16) {
           bestDealSection(cheapest)
           otherResultsList
         }
-      } else {
+      case .empty:
         emptyResultsView
       }
     }
@@ -36,11 +42,6 @@ struct ShoppingResultsView: View {
           results: viewModel.allResults,
           filterParameters: $viewModel.filterParameters
         )
-      }
-    }
-    .alert(viewModel.errorMessage ?? "", isPresented: $viewModel.showAlert) {
-      Button("OK") {
-        viewModel.errorMessage = nil
       }
     }
     .task {
@@ -72,7 +73,7 @@ struct ShoppingResultsView: View {
 
   @ToolbarContentBuilder
   private var filterButton: some ToolbarContent {
-    if !viewModel.isLoading {
+    if case .loaded = viewModel.state {
       ToolbarItem(placement: .topBarTrailing) {
         Button {
           isFilterSheetPresented = true

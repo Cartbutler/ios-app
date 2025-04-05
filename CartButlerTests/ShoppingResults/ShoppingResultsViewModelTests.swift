@@ -44,16 +44,15 @@ struct ShoppingResultsViewModelTests {
     total: 12.99
   )
 
-  private let otherResult2 =
-    ShoppingResultsDTO(
-      storeId: 3,
-      storeName: "Expensive Store",
-      storeLocation: "Location 3",
-      storeAddress: "Address 3",
-      storeImage: "",
-      products: [],
-      total: 15.99
-    )
+  private let otherResult2 = ShoppingResultsDTO(
+    storeId: 3,
+    storeName: "Expensive Store",
+    storeLocation: "Location 3",
+    storeAddress: "Address 3",
+    storeImage: "",
+    products: [],
+    total: 15.99
+  )
 
   private let sortedShoppingResults: [ShoppingResultsDTO]
   private let otherResults: [ShoppingResultsDTO]
@@ -71,7 +70,7 @@ struct ShoppingResultsViewModelTests {
       .willReturn(mockCartSubject.eraseToAnyPublisher())
   }
 
-  // MARK: - Loading state
+  // MARK: - State Tests
 
   @Test
   func fetchResultsShouldSetLoadingState() async throws {
@@ -79,12 +78,12 @@ struct ShoppingResultsViewModelTests {
     given(mockAPIService)
       .fetchShoppingResults(cartId: .any, storeIds: .any, radius: .any, lat: .any, long: .any)
       .willReturn(sortedShoppingResults)
-    #expect(sut.isLoading == false)
+    #expect(sut.state == .idle)
 
     await confirmation { loadStarted in
-      let subscription = sut.$isLoading.sink { isLoading in
+      let subscription = sut.$state.sink { state in
         // Then
-        if isLoading {
+        if case .loading = state {
           loadStarted.confirm()
         }
       }
@@ -94,7 +93,11 @@ struct ShoppingResultsViewModelTests {
     }
 
     // Then
-    #expect(sut.isLoading == false)
+    if case .loaded(let result) = sut.state {
+      #expect(result == cheapestResult)
+    } else {
+      Issue.record("Expected loaded state")
+    }
   }
 
   // MARK: - Fetching results
@@ -112,18 +115,20 @@ struct ShoppingResultsViewModelTests {
       )
       .willReturn(sortedShoppingResults)
 
-    #expect(sut.errorMessage == nil)
+    #expect(sut.state == .idle)
     #expect(sut.showAlert == false)
-    #expect(sut.cheapestResult == nil)
 
     // When
     await sut.fetchResults()
 
     // Then
-    #expect(sut.errorMessage == nil)
+    if case .loaded(let result) = sut.state {
+      #expect(result == cheapestResult)
+    } else {
+      Issue.record("Expected loaded state")
+    }
     #expect(sut.showAlert == false)
     #expect(sut.allResults == sortedShoppingResults)
-    #expect(sut.cheapestResult == cheapestResult)
     #expect(sut.otherResults == otherResults)
   }
 
@@ -134,19 +139,21 @@ struct ShoppingResultsViewModelTests {
       .fetchShoppingResults(cartId: .any, storeIds: .any, radius: .any, lat: .any, long: .any)
       .willThrow(NetworkError.invalidResponse)
 
-    #expect(sut.errorMessage == nil)
+    #expect(sut.state == .idle)
     #expect(sut.showAlert == false)
-    #expect(sut.cheapestResult == nil)
     #expect(sut.otherResults == [])
 
     // When
     await sut.fetchResults()
 
     // Then
-    #expect(sut.errorMessage != nil)
+    if case .error(let message) = sut.state {
+      #expect(message.contains("Failed to load shopping results"))
+    } else {
+      Issue.record("Expected loaded state")
+    }
     #expect(sut.showAlert == true)
     #expect(sut.allResults == [])
-    #expect(sut.cheapestResult == nil)
     #expect(sut.otherResults == [])
   }
 
@@ -154,19 +161,21 @@ struct ShoppingResultsViewModelTests {
   func fetchResultsFailureWithEmptyCart() async throws {
     // Given
     mockCartSubject.send(nil)
-    #expect(sut.errorMessage == nil)
+    #expect(sut.state == .idle)
     #expect(sut.showAlert == false)
-    #expect(sut.cheapestResult == nil)
     #expect(sut.otherResults == [])
 
     // When
     await sut.fetchResults()
 
     // Then
-    #expect(sut.errorMessage == "No items in cart")
+    if case .error(let message) = sut.state {
+      #expect(message == "No items in cart")
+    } else {
+      Issue.record("Expected loaded state")
+    }
     #expect(sut.showAlert == true)
     #expect(sut.allResults == [])
-    #expect(sut.cheapestResult == nil)
     #expect(sut.otherResults == [])
     verify(mockAPIService)
       .fetchShoppingResults(cartId: .any, storeIds: .any, radius: .any, lat: .any, long: .any)
@@ -174,7 +183,7 @@ struct ShoppingResultsViewModelTests {
   }
 
   @Test
-  func fetchResultsShouldNotCallAPIIfAlreadyLoaded() async throws {
+  func fetchResultsShouldNotCallAPIIfNotIdle() async throws {
     // Given
     given(mockAPIService)
       .fetchShoppingResults(
@@ -187,8 +196,8 @@ struct ShoppingResultsViewModelTests {
       .willReturn(sortedShoppingResults)
 
     // When
-    await sut.fetchResults()  // First call
-    await sut.fetchResults()  // Second call
+    await sut.fetchResults()  // First call sets state to .loaded
+    await sut.fetchResults()  // Second call should not call API
 
     // Then
     verify(mockAPIService)
@@ -232,10 +241,10 @@ struct ShoppingResultsViewModelTests {
       .called(1)  // Should only be called once
   }
 
-  // MARK: - Cheapest Result Tests
+  // MARK: - Results Tests
 
   @Test
-  func fetchResultsShouldSeparateCheapestResult() async throws {
+  func fetchResultsShouldSeparateResults() async throws {
     // Given
     given(mockAPIService)
       .fetchShoppingResults(
@@ -248,7 +257,6 @@ struct ShoppingResultsViewModelTests {
       .willReturn(sortedShoppingResults)
 
     #expect(sut.allResults == [])
-    #expect(sut.cheapestResult == nil)
     #expect(sut.otherResults == [])
 
     // When
@@ -256,15 +264,19 @@ struct ShoppingResultsViewModelTests {
 
     // Then
     #expect(sut.allResults == sortedShoppingResults)
-    #expect(sut.cheapestResult?.storeId == 1)
-    #expect(sut.cheapestResult?.total == 10.99)
     #expect(sut.otherResults.count == 2)
     #expect(sut.otherResults.first?.storeId == 2)
     #expect(sut.otherResults.last?.storeId == 3)
+    if case .loaded(let result) = sut.state {
+      #expect(result.storeId == 1)
+      #expect(result.total == 10.99)
+    } else {
+      Issue.record("Expected loaded state")
+    }
   }
 
   @Test
-  func fetchResultsWithSingleResultShouldHaveNoCheapestResult() async throws {
+  func fetchResultsWithSingleResultShouldSetLoadedState() async throws {
     // Given
     let singleResult = [cheapestResult]
     given(mockAPIService)
@@ -282,12 +294,17 @@ struct ShoppingResultsViewModelTests {
 
     // Then
     #expect(sut.allResults == singleResult)
-    #expect(sut.cheapestResult?.storeId == 1)
     #expect(sut.otherResults == [])
+    if case .loaded(let result) = sut.state {
+      #expect(result.storeId == 1)
+      #expect(result.total == 10.99)
+    } else {
+      Issue.record("Expected loaded state")
+    }
   }
 
   @Test
-  func fetchResultsWithEmptyResultsShouldHaveNoResults() async throws {
+  func fetchResultsWithEmptyResultsShouldSetEmptyState() async throws {
     // Given
     given(mockAPIService)
       .fetchShoppingResults(
@@ -304,8 +321,8 @@ struct ShoppingResultsViewModelTests {
 
     // Then
     #expect(sut.allResults == [])
-    #expect(sut.cheapestResult == nil)
     #expect(sut.otherResults == [])
+    #expect(sut.state == .empty)
   }
 
   @Test
@@ -316,7 +333,6 @@ struct ShoppingResultsViewModelTests {
       .willThrow(NetworkError.invalidResponse)
 
     #expect(sut.allResults == [])
-    #expect(sut.cheapestResult == nil)
     #expect(sut.otherResults == [])
 
     // When
@@ -324,9 +340,12 @@ struct ShoppingResultsViewModelTests {
 
     // Then
     #expect(sut.allResults == [])
-    #expect(sut.cheapestResult == nil)
     #expect(sut.otherResults == [])
-    #expect(sut.errorMessage != nil)
+    if case .error(let message) = sut.state {
+      #expect(message.contains("Failed to load shopping results"))
+    } else {
+      Issue.record("Expected loaded state")
+    }
     #expect(sut.showAlert == true)
   }
 }
