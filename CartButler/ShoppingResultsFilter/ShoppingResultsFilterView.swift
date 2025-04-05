@@ -27,6 +27,7 @@ struct ShoppingResultsFilterView: View {
         storesSection
         Spacer()
         applyButton
+        clearButton
       }
       .padding(.vertical)
     }
@@ -119,6 +120,20 @@ struct ShoppingResultsFilterView: View {
     }
     .foregroundStyle(.onPrimary)
     .buttonStyle(.borderedProminent)
+    .padding(.horizontal)
+  }
+
+  private var clearButton: some View {
+    Button {
+      viewModel.clearFilters()
+      dismiss()
+    } label: {
+      Text("Clear filters")
+        .frame(maxWidth: .infinity)
+        .padding(8)
+    }
+    .foregroundStyle(.secondaryVariant)
+    .buttonStyle(.bordered)
     .padding(.horizontal)
   }
 

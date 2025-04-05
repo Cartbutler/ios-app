@@ -16,13 +16,6 @@ final class ShoppingResultsFilterViewModel: ObservableObject {
     minRadius...maxRadius
   }
 
-  struct StoreFilterDTO: Identifiable {
-    let id: Int
-    let name: String
-    let imagePath: String
-    var isSelected: Bool
-  }
-
   @Published var selectedRadius: Double
   @Published var stores: [StoreFilterDTO]
 
@@ -58,5 +51,9 @@ final class ShoppingResultsFilterViewModel: ObservableObject {
       distance: selectedRadius,
       selectedStoreIds: Set(stores.filter(\.isSelected).map(\.id))
     )
+  }
+
+  func clearFilters() {
+    filterParameters = nil
   }
 }
