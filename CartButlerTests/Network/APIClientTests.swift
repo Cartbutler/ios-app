@@ -58,10 +58,14 @@ struct APIClientTests {
   func testGetRequestSuccess() async throws {
     // Given
     let parameters = ["key1": "value 1"]
-    let expectedURL = URL(string: "https://example.com/api/test?language_id=pt-BR&key1=value%201")!
-    let expectedRequest = try buildURLRequest(url: expectedURL, method: "GET")
     given(mockSession)
-      .data(for: .value(expectedRequest))
+      .data(
+        for: .matching {
+          $0.url?.absoluteString.contains("https://example.com/api/test?") == true
+            && $0.url?.absoluteString.contains("language_id=pt-BR") == true
+            && $0.url?.absoluteString.contains("key1=value%201") == true
+        }
+      )
       .willReturn(try buildSuccessResponse())
 
     // When

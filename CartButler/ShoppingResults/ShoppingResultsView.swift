@@ -13,16 +13,22 @@ struct ShoppingResultsView: View {
 
   var body: some View {
     Group {
-      if viewModel.isLoading {
+      switch viewModel.state {
+      case .idle, .loading:
         loadingView
-      } else if let errorMessage = viewModel.errorMessage {
+      case .error(let errorMessage):
         errorView(message: errorMessage)
-      } else if let cheapest = viewModel.cheapestResult {
+          .alert(errorMessage, isPresented: $viewModel.showAlert) {
+            Button("OK") {
+              viewModel.showAlert = false
+            }
+          }
+      case .loaded(let cheapest):
         VStack(spacing: 16) {
           bestDealSection(cheapest)
           otherResultsList
         }
-      } else {
+      case .empty:
         emptyResultsView
       }
     }
@@ -32,12 +38,10 @@ struct ShoppingResultsView: View {
     .toolbar { filterButton }
     .sheet(isPresented: $isFilterSheetPresented) {
       NavigationStack {
-        ShoppingResultsFilterView(results: viewModel.allResults)
-      }
-    }
-    .alert(viewModel.errorMessage ?? "", isPresented: $viewModel.showAlert) {
-      Button("OK") {
-        viewModel.errorMessage = nil
+        ShoppingResultsFilterView(
+          results: viewModel.allResults,
+          filterParameters: $viewModel.filterParameters
+        )
       }
     }
     .task {
@@ -69,16 +73,27 @@ struct ShoppingResultsView: View {
 
   @ToolbarContentBuilder
   private var filterButton: some ToolbarContent {
-    if !viewModel.isLoading {
+    if case .loaded = viewModel.state {
       ToolbarItem(placement: .topBarTrailing) {
         Button {
           isFilterSheetPresented = true
         } label: {
           Image(systemName: "line.3.horizontal.decrease")
             .font(.title2)
+            .overlay(alignment: .topTrailing) { filterBadge }
         }
         .foregroundStyle(.onBackground)
       }
+    }
+  }
+
+  @ViewBuilder
+  private var filterBadge: some View {
+    if viewModel.filterParameters != nil {
+      Circle()
+        .fill(Color.themePrimary)
+        .frame(width: 8, height: 8)
+        .offset(x: 4, y: -4)
     }
   }
 
