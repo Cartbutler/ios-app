@@ -85,6 +85,7 @@ final class APIService: APIServiceProvider {
     cartId: Int, storeIds: [Int]?, radius: Double?, lat: Double?, long: Double?
   ) async throws -> [ShoppingResultsDTO] {
     var queryParameters = try await ["cart_id": String(cartId), "user_id": sessionID]
+    queryParameters["radius"] = radius.flatMap { String($0) }
     queryParameters["store_ids"] = storeIds?.map(String.init).joined(separator: ",")
     queryParameters["user_location"] = [lat, long].compactMap { $0 }.map { String($0) }.joined(
       separator: ",")

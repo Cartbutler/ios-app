@@ -331,6 +331,7 @@ struct APIServiceTests {
       $0?["cart_id"] == "123"
         && $0?["user_id"] != nil
         && $0?["store_ids"] == "1,2"
+        && $0?["radius"] == "12.345"
         && $0?["user_location"] == "1.2,2.3"
     }
     given(mockAPIClient)
