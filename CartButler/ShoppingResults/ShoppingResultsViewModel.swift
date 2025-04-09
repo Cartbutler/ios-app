@@ -27,9 +27,7 @@ final class ShoppingResultsViewModel: ObservableObject {
   }
   @Published var showAlert = false
   @Published var filterParameters: FilterParameters? {
-    didSet {
-      print("Filter parameters changed: \(filterParameters)")
-    }
+    didSet { refetchResults() }
   }
 
   private let apiService: APIServiceProvider
@@ -49,7 +47,13 @@ final class ShoppingResultsViewModel: ObservableObject {
 
     do {
       if let cartId = try await cartRepository.cartPublisher.values.first()??.id {
-        allResults = try await apiService.fetchShoppingResults(cartId: cartId)
+        allResults = try await apiService.fetchShoppingResults(
+          cartId: cartId,
+          storeIds: filterParameters?.storeIds,
+          radius: filterParameters?.radius,
+          lat: filterParameters?.latitude,
+          long: filterParameters?.longitude
+        )
         if let cheapest = allResults.first {
           state = .loaded(cheapest)
           otherResults = Array(allResults.dropFirst())
@@ -62,6 +66,15 @@ final class ShoppingResultsViewModel: ObservableObject {
       }
     } catch {
       state = .error("Failed to load shopping results: \(error.localizedDescription)")
+    }
+  }
+
+  private func refetchResults() {
+    Task {
+      state = .idle
+      allResults = []
+      otherResults = []
+      await fetchResults()
     }
   }
 }

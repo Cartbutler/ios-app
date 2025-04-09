@@ -6,6 +6,7 @@
 //
 
 import Combine
+import CoreLocation
 import Foundation
 import Mockable
 import Testing
@@ -347,5 +348,74 @@ struct ShoppingResultsViewModelTests {
       Issue.record("Expected loaded state")
     }
     #expect(sut.showAlert == true)
+  }
+
+  @Test
+  func fetchResultsWithFilterParameters() async throws {
+    // Given
+    let filterParameters = FilterParameters(
+      distance: 5.0,
+      selectedStoreIds: [1],
+      location: CLLocation(latitude: 10, longitude: 20)
+    )
+
+    given(mockAPIService)
+      .fetchShoppingResults(
+        cartId: .value(1),
+        storeIds: .value([1]),
+        radius: .value(5.0),
+        lat: .value(10),
+        long: .value(20)
+      )
+      .willReturn(sortedShoppingResults)
+
+    // When
+    sut.filterParameters = filterParameters
+    await sut.fetchResults()
+
+    // Then
+    if case .loaded(let result) = sut.state {
+      #expect(result == cheapestResult)
+    } else {
+      Issue.record("Expected loaded state")
+    }
+    #expect(sut.allResults == sortedShoppingResults)
+    #expect(sut.otherResults == otherResults)
+  }
+
+  @Test
+  func changingFilterParametersShouldRefetch() async throws {
+    // Given
+    given(mockAPIService)
+      .fetchShoppingResults(
+        cartId: .value(1),
+        storeIds: .value(nil),
+        radius: .value(nil),
+        lat: .value(nil),
+        long: .value(nil)
+      )
+      .willReturn(sortedShoppingResults)
+    given(mockAPIService)
+      .fetchShoppingResults(
+        cartId: .value(1),
+        storeIds: .value([1]),
+        radius: .value(nil),
+        lat: .value(nil),
+        long: .value(nil)
+      )
+      .willReturn(otherResults)
+
+    await sut.fetchResults()  // First fetch
+    #expect(sut.state == .loaded(cheapestResult))
+
+    // When
+    sut.filterParameters = FilterParameters(distance: 1, selectedStoreIds: [1], location: nil)
+    _ = await sut.$state.values.first { $0 == .loading }
+
+    // Then
+    let result = await sut.$state.values.first {
+      if case .loaded = $0 { return true } else { return false }
+    }
+    #expect(result == .loaded(otherResult1))
   }
 }
