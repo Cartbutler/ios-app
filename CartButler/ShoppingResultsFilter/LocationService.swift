@@ -7,6 +7,7 @@
 
 import CoreLocation
 import Foundation
+import Mockable
 
 enum LocationError: Error {
   case permissionDenied
@@ -14,6 +15,7 @@ enum LocationError: Error {
   case permissionRequestFailed
 }
 
+@Mockable
 @MainActor
 protocol LocationServiceProvider {
   func getCurrentLocation() async throws -> CLLocation

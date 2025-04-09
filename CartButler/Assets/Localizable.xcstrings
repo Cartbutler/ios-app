@@ -158,6 +158,16 @@
         }
       }
     },
+    "Dismiss" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fechar"
+          }
+        }
+      }
+    },
     "Distance" : {
       "localizations" : {
         "pt-BR" : {
@@ -240,6 +250,26 @@
         }
       }
     },
+    "Location Permission Required" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permissão de localização necessária"
+          }
+        }
+      }
+    },
+    "Location Unavailable" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Localização indisponível"
+          }
+        }
+      }
+    },
     "No products found" : {
       "localizations" : {
         "pt-BR" : {
@@ -270,12 +300,32 @@
         }
       }
     },
+    "Open Settings" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir configurações"
+          }
+        }
+      }
+    },
     "Other Options" : {
       "localizations" : {
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Outras opções"
+          }
+        }
+      }
+    },
+    "Please enable location access in Settings to filter by distance." : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por favor ative acesso à localização nas Configurações para filtrar por distância."
           }
         }
       }
@@ -346,6 +396,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lojas"
+          }
+        }
+      }
+    },
+    "Unable to get your current location. Please try again later." : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível obter sua localização atual. Por favor tente mais tarde."
           }
         }
       }

@@ -5,6 +5,8 @@
 //  Created by Cassiano Monteiro on 2025-03-16.
 //
 
+import CoreLocation
+import Mockable
 import SwiftUI
 import Testing
 
@@ -17,6 +19,16 @@ final class ShoppingResultsFilterViewModelTests {
     get: { self.filterParameters },
     set: { self.filterParameters = $0 }
   )
+  private let mockLocationService = MockLocationServiceProvider()
+  private let mockLocation = CLLocation(latitude: 10, longitude: 20)
+
+  // MARK: - Setup
+
+  init() {
+    given(mockLocationService)
+      .getCurrentLocation()
+      .willReturn(mockLocation)
+  }
 
   // MARK: - Initialization Tests
 
@@ -26,7 +38,11 @@ final class ShoppingResultsFilterViewModelTests {
     let results = [makeShoppingResult(id: 1), makeShoppingResult(id: 2)]
 
     // When
-    let sut = ShoppingResultsFilterViewModel(results: results, filterParameters: mockBinding)
+    let sut = ShoppingResultsFilterViewModel(
+      results: results,
+      filterParameters: mockBinding,
+      locationService: mockLocationService
+    )
 
     // Then
     #expect(sut.selectedRadius == sut.maxRadius)
@@ -38,10 +54,14 @@ final class ShoppingResultsFilterViewModelTests {
   func initWithFilterParametersShouldSetValuesFromParameters() async {
     // Given
     let results = [makeShoppingResult(id: 1), makeShoppingResult(id: 2)]
-    filterParameters = FilterParameters(distance: 5.0, selectedStoreIds: [1])
+    filterParameters = FilterParameters(distance: 5.0, selectedStoreIds: [1], location: nil)
 
     // When
-    let sut = ShoppingResultsFilterViewModel(results: results, filterParameters: mockBinding)
+    let sut = ShoppingResultsFilterViewModel(
+      results: results,
+      filterParameters: mockBinding,
+      locationService: mockLocationService
+    )
 
     // Then
     #expect(sut.selectedRadius == 5.0)
@@ -54,10 +74,14 @@ final class ShoppingResultsFilterViewModelTests {
   // MARK: - Store Selection Tests
 
   @Test
-  func ttoggleStoreSelectionShouldChangeSelectionValue() async {
+  func toggleStoreSelectionShouldChangeSelectionValue() async {
     // Given
     let results = [makeShoppingResult(id: 1)]
-    let sut = ShoppingResultsFilterViewModel(results: results, filterParameters: mockBinding)
+    let sut = ShoppingResultsFilterViewModel(
+      results: results,
+      filterParameters: mockBinding,
+      locationService: mockLocationService
+    )
     #expect(sut.stores.count == 1)
     #expect(sut.stores.first?.isSelected == true)
 
@@ -72,7 +96,11 @@ final class ShoppingResultsFilterViewModelTests {
   func toggleStoreSelectionInvalidIdShouldNotChangeSelection() async {
     // Given
     let results = [makeShoppingResult(id: 1)]
-    let sut = ShoppingResultsFilterViewModel(results: results, filterParameters: mockBinding)
+    let sut = ShoppingResultsFilterViewModel(
+      results: results,
+      filterParameters: mockBinding,
+      locationService: mockLocationService
+    )
     #expect(sut.stores.count == 1)
     #expect(sut.stores.first?.isSelected == true)
 
@@ -83,39 +111,95 @@ final class ShoppingResultsFilterViewModelTests {
     #expect(sut.stores.first?.isSelected == true)
   }
 
+  // MARK: - Location Tests
+
+  @Test
+  func applyFiltersShouldShowLocationUnavailableAlert() async {
+    // Given
+    mockLocationService.reset()
+    given(mockLocationService)
+      .getCurrentLocation()
+      .willThrow(LocationError.locationUnavailable)
+    let sut = ShoppingResultsFilterViewModel(
+      results: [],
+      filterParameters: mockBinding,
+      locationService: mockLocationService
+    )
+
+    // When
+    let result = await sut.applyFilters()
+
+    // Then
+    #expect(result == false)
+    #expect(sut.showLocationUnavailableAlert == true)
+  }
+
+  @Test
+  func applyFiltersShouldShowPermissionDeniedAlert() async {
+    // Given
+    mockLocationService.reset()
+    given(mockLocationService)
+      .getCurrentLocation()
+      .willThrow(LocationError.permissionDenied)
+    let sut = ShoppingResultsFilterViewModel(
+      results: [],
+      filterParameters: mockBinding,
+      locationService: mockLocationService
+    )
+
+    // When
+    let result = await sut.applyFilters()
+
+    // Then
+    #expect(result == false)
+    #expect(sut.showPermissionDeniedAlert == true)
+  }
+
   // MARK: - Filter Application Tests
 
   @Test
   func applyFiltersShouldUpdateFilterParameters() async {
     // Given
     let results = [makeShoppingResult(id: 1), makeShoppingResult(id: 2)]
-    let sut = ShoppingResultsFilterViewModel(results: results, filterParameters: mockBinding)
+    let sut = ShoppingResultsFilterViewModel(
+      results: results,
+      filterParameters: mockBinding,
+      locationService: mockLocationService
+    )
     sut.selectedRadius = 3.0
     sut.toggleStoreSelection(1)
 
     // When
-    sut.applyFilters()
+    let result = await sut.applyFilters()
 
     // Then
+    #expect(result == true)
     #expect(filterParameters?.distance == 3.0)
     #expect(filterParameters?.selectedStoreIds == [2])
+    #expect(filterParameters?.location == mockLocation)
   }
 
   @Test
   func applyFiltersWithNoStoresSelectedWhouldUpdateFilterParameters() async {
     // Given
     let results = [makeShoppingResult(id: 1), makeShoppingResult(id: 2)]
-    let sut = ShoppingResultsFilterViewModel(results: results, filterParameters: mockBinding)
+    let sut = ShoppingResultsFilterViewModel(
+      results: results,
+      filterParameters: mockBinding,
+      locationService: mockLocationService
+    )
     sut.selectedRadius = 3.0
     sut.toggleStoreSelection(1)
     sut.toggleStoreSelection(2)
 
     // When
-    sut.applyFilters()
+    let result = await sut.applyFilters()
 
     // Then
+    #expect(result == true)
     #expect(filterParameters?.distance == 3.0)
     #expect(filterParameters?.selectedStoreIds == [])
+    #expect(filterParameters?.location == mockLocation)
   }
 
   // MARK: - Clear Filters Tests
@@ -124,8 +208,13 @@ final class ShoppingResultsFilterViewModelTests {
   func clearFiltersShouldSetFilterParametersToNil() async {
     // Given
     let results = [makeShoppingResult(id: 1)]
-    let sut = ShoppingResultsFilterViewModel(results: results, filterParameters: mockBinding)
-    sut.applyFilters()
+    let sut = ShoppingResultsFilterViewModel(
+      results: results,
+      filterParameters: mockBinding,
+      locationService: mockLocationService
+    )
+    let result = await sut.applyFilters()
+    #expect(result == true)
     #expect(filterParameters != nil)
 
     // When
