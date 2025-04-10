@@ -10,6 +10,7 @@ import SwiftUI
 struct ShoppingResultsFilterView: View {
   @StateObject private var viewModel: ShoppingResultsFilterViewModel
   @Environment(\.dismiss) private var dismiss
+  @Environment(\.openURL) private var openURL
 
   init(results: [ShoppingResultsDTO], filterParameters: Binding<FilterParameters?>) {
     self._viewModel = StateObject(
@@ -36,6 +37,32 @@ struct ShoppingResultsFilterView: View {
     .toolbar { closeButton }
     .foregroundStyle(.onBackground)
     .backgroundStyle(.themeBackground)
+    .alert(
+      "Location Permission Required", isPresented: $viewModel.showPermissionDeniedAlert,
+      actions: {
+        Button("Open Settings") {
+          if let url = URL(string: UIApplication.openSettingsURLString) {
+            openURL(url)
+          }
+        }
+        Button("Dismiss") {
+          viewModel.showPermissionDeniedAlert = false
+        }
+      },
+      message: {
+        Text("Please enable location access in Settings to filter by distance.")
+      }
+    )
+    .alert(
+      "Location Unavailable", isPresented: $viewModel.showLocationUnavailableAlert,
+      actions: {
+        Button("OK") {
+          viewModel.showLocationUnavailableAlert = false
+        }
+      },
+      message: {
+        Text("Unable to get your current location. Please try again later.")
+      })
   }
 
   private var distanceSection: some View {
@@ -111,8 +138,11 @@ struct ShoppingResultsFilterView: View {
 
   private var applyButton: some View {
     Button {
-      viewModel.applyFilters()
-      dismiss()
+      Task {
+        if await viewModel.applyFilters() {
+          dismiss()
+        }
+      }
     } label: {
       Text("Apply Filters")
         .frame(maxWidth: .infinity)
