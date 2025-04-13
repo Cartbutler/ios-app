@@ -530,4 +530,87 @@ struct ShoppingResultsViewModelTests {
     // Then
     #expect(sut.isFilterAvailable == true)
   }
+
+  // MARK: - Available Stores Tests
+
+  @Test
+  func availableStoresShouldBeEmptyInitially() {
+    // Then
+    #expect(sut.availableStores.isEmpty)
+  }
+
+  @Test
+  func availableStoresShouldBeSetAfterFirstFetch() async throws {
+    // Given
+    given(mockAPIService)
+      .fetchShoppingResults(
+        cartId: .value(1),
+        storeIds: .value(nil),
+        radius: .value(nil),
+        lat: .value(nil),
+        long: .value(nil)
+      )
+      .willReturn(sortedShoppingResults)
+
+    #expect(sut.availableStores.isEmpty)
+
+    // When
+    await sut.fetchResults()
+
+    // Then
+    #expect(sut.availableStores.count == 3)
+    #expect(sut.availableStores[0].id == 1)
+    #expect(sut.availableStores[0].name == "Cheapest Store")
+    #expect(sut.availableStores[0].isSelected)
+    #expect(sut.availableStores[1].id == 2)
+    #expect(sut.availableStores[1].name == "Medium Store")
+    #expect(sut.availableStores[1].isSelected)
+    #expect(sut.availableStores[2].id == 3)
+    #expect(sut.availableStores[2].name == "Expensive Store")
+    #expect(sut.availableStores[2].isSelected)
+  }
+
+  @Test
+  func availableStoresShouldNotBeUpdatedOnSubsequentFetches() async throws {
+    // Given
+    given(mockAPIService)
+      .fetchShoppingResults(
+        cartId: .value(1),
+        storeIds: .value(nil),
+        radius: .value(nil),
+        lat: .value(nil),
+        long: .value(nil)
+      )
+      .willReturn(sortedShoppingResults)
+
+    // When
+    await sut.fetchResults()  // First fetch
+    let firstAvailableStores = sut.availableStores
+    await sut.fetchResults()  // Second fetch
+
+    // Then
+    #expect(sut.availableStores == firstAvailableStores)
+  }
+
+  @Test
+  func availableStoresShouldBeEmptyWhenNoResults() async throws {
+    // Given
+    given(mockAPIService)
+      .fetchShoppingResults(
+        cartId: .value(1),
+        storeIds: .value(nil),
+        radius: .value(nil),
+        lat: .value(nil),
+        long: .value(nil)
+      )
+      .willReturn([])
+
+    #expect(sut.availableStores.isEmpty)
+
+    // When
+    await sut.fetchResults()
+
+    // Then
+    #expect(sut.availableStores.isEmpty)
+  }
 }

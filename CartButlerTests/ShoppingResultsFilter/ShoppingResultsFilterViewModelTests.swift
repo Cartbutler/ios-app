@@ -35,11 +35,11 @@ final class ShoppingResultsFilterViewModelTests {
   @Test
   func initWithNoFilterParametersWhouldSetDefaultValues() async {
     // Given
-    let results = [makeShoppingResult(id: 1), makeShoppingResult(id: 2)]
+    let stores = [makeStore(id: 1), makeStore(id: 2)]
 
     // When
     let sut = ShoppingResultsFilterViewModel(
-      results: results,
+      stores: stores,
       filterParameters: mockBinding,
       locationService: mockLocationService
     )
@@ -53,12 +53,12 @@ final class ShoppingResultsFilterViewModelTests {
   @Test
   func initWithFilterParametersShouldSetValuesFromParameters() async {
     // Given
-    let results = [makeShoppingResult(id: 1), makeShoppingResult(id: 2)]
+    let stores = [makeStore(id: 1), makeStore(id: 2)]
     filterParameters = FilterParameters(distance: 5.0, selectedStoreIds: [1], location: nil)
 
     // When
     let sut = ShoppingResultsFilterViewModel(
-      results: results,
+      stores: stores,
       filterParameters: mockBinding,
       locationService: mockLocationService
     )
@@ -76,9 +76,9 @@ final class ShoppingResultsFilterViewModelTests {
   @Test
   func toggleStoreSelectionShouldChangeSelectionValue() async {
     // Given
-    let results = [makeShoppingResult(id: 1)]
+    let stores = [makeStore(id: 1)]
     let sut = ShoppingResultsFilterViewModel(
-      results: results,
+      stores: stores,
       filterParameters: mockBinding,
       locationService: mockLocationService
     )
@@ -95,9 +95,9 @@ final class ShoppingResultsFilterViewModelTests {
   @Test
   func toggleStoreSelectionInvalidIdShouldNotChangeSelection() async {
     // Given
-    let results = [makeShoppingResult(id: 1)]
+    let stores = [makeStore(id: 1)]
     let sut = ShoppingResultsFilterViewModel(
-      results: results,
+      stores: stores,
       filterParameters: mockBinding,
       locationService: mockLocationService
     )
@@ -121,7 +121,7 @@ final class ShoppingResultsFilterViewModelTests {
       .getCurrentLocation()
       .willThrow(LocationError.locationUnavailable)
     let sut = ShoppingResultsFilterViewModel(
-      results: [],
+      stores: [],
       filterParameters: mockBinding,
       locationService: mockLocationService
     )
@@ -142,7 +142,7 @@ final class ShoppingResultsFilterViewModelTests {
       .getCurrentLocation()
       .willThrow(LocationError.permissionDenied)
     let sut = ShoppingResultsFilterViewModel(
-      results: [],
+      stores: [],
       filterParameters: mockBinding,
       locationService: mockLocationService
     )
@@ -160,9 +160,9 @@ final class ShoppingResultsFilterViewModelTests {
   @Test
   func applyFiltersShouldUpdateFilterParameters() async {
     // Given
-    let results = [makeShoppingResult(id: 1), makeShoppingResult(id: 2)]
+    let stores = [makeStore(id: 1), makeStore(id: 2)]
     let sut = ShoppingResultsFilterViewModel(
-      results: results,
+      stores: stores,
       filterParameters: mockBinding,
       locationService: mockLocationService
     )
@@ -182,9 +182,9 @@ final class ShoppingResultsFilterViewModelTests {
   @Test
   func applyFiltersWithNoStoresSelectedWhouldUpdateFilterParameters() async {
     // Given
-    let results = [makeShoppingResult(id: 1), makeShoppingResult(id: 2)]
+    let stores = [makeStore(id: 1), makeStore(id: 2)]
     let sut = ShoppingResultsFilterViewModel(
-      results: results,
+      stores: stores,
       filterParameters: mockBinding,
       locationService: mockLocationService
     )
@@ -207,9 +207,9 @@ final class ShoppingResultsFilterViewModelTests {
   @Test
   func clearFiltersShouldSetFilterParametersToNil() async {
     // Given
-    let results = [makeShoppingResult(id: 1)]
+    let stores = [makeStore(id: 1)]
     let sut = ShoppingResultsFilterViewModel(
-      results: results,
+      stores: stores,
       filterParameters: mockBinding,
       locationService: mockLocationService
     )
@@ -224,15 +224,12 @@ final class ShoppingResultsFilterViewModelTests {
     #expect(filterParameters == nil)
   }
 
-  private func makeShoppingResult(id: Int) -> ShoppingResultsDTO {
-    ShoppingResultsDTO(
-      storeId: id,
-      storeName: "Store\(id)",
-      storeLocation: "image\(id)",
-      storeAddress: "",
-      storeImage: "",
-      products: [],
-      total: 0.0
+  private func makeStore(id: Int) -> StoreFilterDTO {
+    StoreFilterDTO(
+      id: id,
+      name: "Store\(id)",
+      imagePath: "image\(id)",
+      isSelected: true
     )
   }
 }

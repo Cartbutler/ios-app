@@ -25,26 +25,26 @@ final class ShoppingResultsFilterViewModel: ObservableObject {
   private let locationService: LocationServiceProvider
 
   init(
-    results: [ShoppingResultsDTO],
+    stores: [StoreFilterDTO],
     filterParameters: Binding<FilterParameters?>,
     locationService: LocationServiceProvider = LocationService()
   ) {
     self._filterParameters = filterParameters
     self.locationService = locationService
     self.selectedRadius = filterParameters.wrappedValue?.distance ?? maxRadius
-    self.stores = Self.mapStores(from: results, using: filterParameters.wrappedValue)
+    self.stores = Self.mapStores(from: stores, using: filterParameters.wrappedValue)
   }
 
   private static func mapStores(
-    from results: [ShoppingResultsDTO],
+    from stores: [StoreFilterDTO],
     using filterParameters: FilterParameters?
   ) -> [StoreFilterDTO] {
-    results.map { result in
+    stores.map { store in
       StoreFilterDTO(
-        id: result.storeId,
-        name: result.storeName,
-        imagePath: result.storeImage,
-        isSelected: filterParameters?.selectedStoreIds.contains(result.storeId) ?? true
+        id: store.id,
+        name: store.name,
+        imagePath: store.imagePath,
+        isSelected: filterParameters?.selectedStoreIds.contains(store.id) ?? true
       )
     }
   }

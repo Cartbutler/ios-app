@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct StoreFilterDTO: Identifiable {
+struct StoreFilterDTO: Identifiable, Equatable {
   let id: Int
   let name: String
   let imagePath: String

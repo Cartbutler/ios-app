@@ -12,10 +12,10 @@ struct ShoppingResultsFilterView: View {
   @Environment(\.dismiss) private var dismiss
   @Environment(\.openURL) private var openURL
 
-  init(results: [ShoppingResultsDTO], filterParameters: Binding<FilterParameters?>) {
+  init(stores: [StoreFilterDTO], filterParameters: Binding<FilterParameters?>) {
     self._viewModel = StateObject(
       wrappedValue: ShoppingResultsFilterViewModel(
-        results: results,
+        stores: stores,
         filterParameters: filterParameters
       )
     )

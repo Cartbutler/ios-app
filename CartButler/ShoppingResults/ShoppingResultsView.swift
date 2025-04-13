@@ -40,7 +40,7 @@ struct ShoppingResultsView: View {
     .sheet(isPresented: $isFilterSheetPresented) {
       NavigationStack {
         ShoppingResultsFilterView(
-          results: viewModel.allResults,
+          stores: viewModel.availableStores,
           filterParameters: $viewModel.filterParameters
         )
       }
