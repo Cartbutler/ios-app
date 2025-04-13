@@ -29,6 +29,10 @@ final class ShoppingResultsViewModel: ObservableObject {
   @Published var filterParameters: FilterParameters? {
     didSet { refetchResults() }
   }
+  var hasFilters: Bool { filterParameters != nil }
+  var isFilterAvailable: Bool {
+    allResults.count > 1 || filterParameters != nil
+  }
 
   private let apiService: APIServiceProvider
   private let cartRepository: CartRepositoryProvider

@@ -418,4 +418,116 @@ struct ShoppingResultsViewModelTests {
     }
     #expect(result == .loaded(otherResult1))
   }
+
+  @Test
+  func hasFiltersShouldReturnFalseWhenNoFilters() {
+    // Given
+    given(mockAPIService)
+      .fetchShoppingResults(
+        cartId: .any,
+        storeIds: .any,
+        radius: .any,
+        lat: .any,
+        long: .any
+      )
+      .willReturn([])
+    sut.filterParameters = nil
+
+    // Then
+    #expect(sut.hasFilters == false)
+  }
+
+  @Test
+  func hasFiltersShouldReturnTrueWhenFiltersAreSet() {
+    // Given
+    given(mockAPIService)
+      .fetchShoppingResults(
+        cartId: .any,
+        storeIds: .any,
+        radius: .any,
+        lat: .any,
+        long: .any
+      )
+      .willReturn([])
+    let filterParameters = FilterParameters(
+      distance: 5.0,
+      selectedStoreIds: [1],
+      location: CLLocation(latitude: 10, longitude: 20)
+    )
+
+    // When
+    sut.filterParameters = filterParameters
+
+    // Then
+    #expect(sut.hasFilters == true)
+  }
+
+  @Test
+  func isFilterAvailableShouldReturnFalseWhenNoResultsAndNoFilters() async throws {
+    // Given
+    given(mockAPIService)
+      .fetchShoppingResults(
+        cartId: .value(1),
+        storeIds: .value(nil),
+        radius: .value(nil),
+        lat: .value(nil),
+        long: .value(nil)
+      )
+      .willReturn([])
+
+    sut.filterParameters = nil
+
+    // When
+    await sut.fetchResults()
+
+    // Then
+    #expect(sut.isFilterAvailable == false)
+  }
+
+  @Test
+  func isFilterAvailableShouldReturnTrueWhenMultipleResults() async throws {
+    // Given
+    given(mockAPIService)
+      .fetchShoppingResults(
+        cartId: .value(1),
+        storeIds: .value(nil),
+        radius: .value(nil),
+        lat: .value(nil),
+        long: .value(nil)
+      )
+      .willReturn(sortedShoppingResults)
+
+    sut.filterParameters = nil
+
+    // When
+    await sut.fetchResults()
+
+    // Then
+    #expect(sut.isFilterAvailable == true)
+  }
+
+  @Test
+  func isFilterAvailableShouldReturnTrueWhenFiltersAreSet() {
+    // Given
+    given(mockAPIService)
+      .fetchShoppingResults(
+        cartId: .any,
+        storeIds: .any,
+        radius: .any,
+        lat: .any,
+        long: .any
+      )
+      .willReturn([])
+    let filterParameters = FilterParameters(
+      distance: 5.0,
+      selectedStoreIds: [1],
+      location: CLLocation(latitude: 10, longitude: 20)
+    )
+
+    // When
+    sut.filterParameters = filterParameters
+
+    // Then
+    #expect(sut.isFilterAvailable == true)
+  }
 }
