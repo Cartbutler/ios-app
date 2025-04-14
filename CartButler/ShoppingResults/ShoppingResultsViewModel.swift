@@ -29,9 +29,14 @@ final class ShoppingResultsViewModel: ObservableObject {
   @Published var filterParameters: FilterParameters? {
     didSet { refetchResults() }
   }
+  var hasFilters: Bool { filterParameters != nil }
+  var isFilterAvailable: Bool {
+    allResults.count > 1 || filterParameters != nil
+  }
 
   private let apiService: APIServiceProvider
   private let cartRepository: CartRepositoryProvider
+  private(set) var availableStores = [StoreFilterDTO]()
 
   init(
     apiService: APIServiceProvider = APIService.shared,
@@ -54,6 +59,10 @@ final class ShoppingResultsViewModel: ObservableObject {
           lat: filterParameters?.latitude,
           long: filterParameters?.longitude
         )
+
+        // Store original store information if this is the first fetch
+        setOriginalStores(from: allResults)
+
         if let cheapest = allResults.first {
           state = .loaded(cheapest)
           otherResults = Array(allResults.dropFirst())
@@ -66,6 +75,18 @@ final class ShoppingResultsViewModel: ObservableObject {
       }
     } catch {
       state = .error("Failed to load shopping results: \(error.localizedDescription)")
+    }
+  }
+
+  private func setOriginalStores(from results: [ShoppingResultsDTO]) {
+    guard availableStores.isEmpty else { return }
+    availableStores = results.map { result in
+      StoreFilterDTO(
+        id: result.storeId,
+        name: result.storeName,
+        imagePath: result.storeImage,
+        isSelected: true
+      )
     }
   }
 

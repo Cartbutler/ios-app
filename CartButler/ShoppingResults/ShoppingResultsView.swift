@@ -27,6 +27,7 @@ struct ShoppingResultsView: View {
         VStack(spacing: 16) {
           bestDealSection(cheapest)
           otherResultsList
+          Spacer()
         }
       case .empty:
         emptyResultsView
@@ -39,7 +40,7 @@ struct ShoppingResultsView: View {
     .sheet(isPresented: $isFilterSheetPresented) {
       NavigationStack {
         ShoppingResultsFilterView(
-          results: viewModel.allResults,
+          stores: viewModel.availableStores,
           filterParameters: $viewModel.filterParameters
         )
       }
@@ -68,12 +69,28 @@ struct ShoppingResultsView: View {
       Text("No shopping results found")
         .font(.headline)
         .padding(.top)
+      if viewModel.hasFilters {
+        clearFiltersButton
+      }
     }
+  }
+
+  private var clearFiltersButton: some View {
+    Button {
+      viewModel.filterParameters = nil
+    } label: {
+      Text("Clear filters")
+        .frame(maxWidth: .infinity)
+        .padding(8)
+    }
+    .foregroundStyle(.onPrimary)
+    .buttonStyle(.borderedProminent)
+    .padding(.horizontal)
   }
 
   @ToolbarContentBuilder
   private var filterButton: some ToolbarContent {
-    if case .loaded = viewModel.state {
+    if viewModel.isFilterAvailable {
       ToolbarItem(placement: .topBarTrailing) {
         Button {
           isFilterSheetPresented = true
