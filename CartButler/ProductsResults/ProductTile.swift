@@ -19,20 +19,7 @@ struct ProductTile: View {
         Spacer()
         VStack {
           Spacer()
-          AsyncImage(url: URL(string: product.imagePath)) { phase in
-            switch phase {
-            case .empty:
-              ProgressView()
-            case .success(let image):
-              image.resizable().aspectRatio(contentMode: .fit)
-            case .failure:
-              Image(systemName: "photo.circle.fill")
-                .font(.largeTitle)
-                .padding()
-            @unknown default:
-              EmptyView()
-            }
-          }
+          AsyncImageView(imagePath: product.imagePath)
           Text(product.productName)
             .font(.headline)
             .foregroundColor(.onSurface)

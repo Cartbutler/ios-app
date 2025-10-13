@@ -11,19 +11,26 @@ struct AsyncImageView: View {
   let imagePath: String
 
   var body: some View {
-    AsyncImage(url: URL(string: imagePath)) { phase in
-      switch phase {
-      case .empty:
-        ProgressView()
-      case .success(let image):
-        image.resizable().aspectRatio(contentMode: .fit)
-      case .failure:
-        Image(systemName: "photo.circle.fill")
-          .font(.largeTitle)
-          .padding()
-      @unknown default:
-        EmptyView()
-      }
-    }
+    Color.clear
+      .aspectRatio(1, contentMode: .fit)  // Square container
+      .overlay(
+        AsyncImage(url: URL(string: imagePath)) { phase in
+          switch phase {
+          case .empty:
+            ProgressView()
+          case .success(let image):
+            image
+              .resizable()
+              .aspectRatio(contentMode: .fill)  // Fill and crop
+          case .failure:
+            Image(systemName: "photo.circle.fill")
+              .font(.largeTitle)
+              .foregroundColor(.gray)
+          @unknown default:
+            EmptyView()
+          }
+        }
+      )
+      .clipped()
   }
 }
