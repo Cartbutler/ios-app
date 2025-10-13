@@ -54,6 +54,7 @@ struct ProductDetailsView: View {
       addToCartButton
         .padding(.bottom, 8)
     }
+    .ignoresSafeArea(edges: .top)
   }
 
   private func productInfo(with product: ProductDTO) -> some View {
