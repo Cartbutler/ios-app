@@ -124,7 +124,7 @@ struct ShoppingResultsFilterView: View {
           .foregroundStyle(.secondaryVariant)
       }
 
-      AsyncImageView(imagePath: store.imagePath)
+      AsyncImageView(imagePath: store.imagePath, style: .original)
         .frame(width: 40, height: 40)
         .clipShape(RoundedRectangle(cornerRadius: 8))
 

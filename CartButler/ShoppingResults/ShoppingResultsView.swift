@@ -163,7 +163,7 @@ struct ShoppingResultsView: View {
 
   private func storeCard(result: ShoppingResultsDTO, style: StoreRowStyle = .others) -> some View {
     HStack {
-      AsyncImageView(imagePath: result.storeImage)
+      AsyncImageView(imagePath: result.storeImage, style: .original)
         .frame(width: style.imageSize, height: style.imageSize)
       VStack(alignment: .leading) {
         Text(result.storeName)

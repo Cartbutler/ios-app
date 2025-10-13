@@ -92,7 +92,7 @@ struct ProductDetailsView: View {
 
   private func storePriceCard(_ store: StoreDTO) -> some View {
     HStack {
-      AsyncImageView(imagePath: store.storeImage)
+      AsyncImageView(imagePath: store.storeImage, style: .original)
         .frame(width: 40, height: 40)
       Text(store.storeName)
         .font(.headline)

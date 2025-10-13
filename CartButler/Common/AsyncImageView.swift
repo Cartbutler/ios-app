@@ -7,30 +7,48 @@
 
 import SwiftUI
 
+enum AsyncImageStyle {
+  case square
+  case original
+  case aspectRatio(CGFloat)
+}
+
 struct AsyncImageView: View {
   let imagePath: String
+  var style: AsyncImageStyle = .square
 
   var body: some View {
+    switch style {
+    case .original: imageContent(fillMode: .fit)
+    case .square: framed(aspectRatio: 1)
+    case .aspectRatio(let ratio): framed(aspectRatio: ratio)
+    }
+  }
+
+  @ViewBuilder
+  private func framed(aspectRatio: CGFloat) -> some View {
     Color.clear
-      .aspectRatio(1, contentMode: .fit)  // Square container
-      .overlay(
-        AsyncImage(url: URL(string: imagePath)) { phase in
-          switch phase {
-          case .empty:
-            ProgressView()
-          case .success(let image):
-            image
-              .resizable()
-              .aspectRatio(contentMode: .fill)  // Fill and crop
-          case .failure:
-            Image(systemName: "photo.circle.fill")
-              .font(.largeTitle)
-              .foregroundColor(.gray)
-          @unknown default:
-            EmptyView()
-          }
-        }
-      )
+      .aspectRatio(aspectRatio, contentMode: .fit)
+      .overlay(imageContent(fillMode: .fill))
       .clipped()
+  }
+
+  @ViewBuilder
+  private func imageContent(fillMode: ContentMode) -> some View {
+    AsyncImage(url: URL(string: imagePath)) { phase in
+      switch phase {
+      case .empty:
+        ProgressView()
+      case .success(let image):
+        image
+          .resizable()
+          .aspectRatio(contentMode: fillMode)
+      case .failure:
+        Image(systemName: "photo.circle.fill")
+          .font(.largeTitle)
+      @unknown default:
+        EmptyView()
+      }
+    }
   }
 }

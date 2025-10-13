@@ -38,7 +38,7 @@ struct StoreDetailsView: View {
 
   private var storeHeader: some View {
     VStack {
-      AsyncImageView(imagePath: result.storeImage)
+      AsyncImageView(imagePath: result.storeImage, style: .original)
         .frame(width: 200)
         .padding(.bottom)
       Text(result.storeAddress)
