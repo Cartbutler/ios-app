@@ -54,7 +54,7 @@ final class ShoppingResultsFilterViewModelTests {
   func initWithFilterParametersShouldSetValuesFromParameters() async {
     // Given
     let stores = [makeStore(id: 1), makeStore(id: 2)]
-    filterParameters = FilterParameters(distance: 5.0, selectedStoreIds: [1], location: nil)
+    filterParameters = FilterParameters(distance: 5.0, selectedStoreIds: [1])
 
     // When
     let sut = ShoppingResultsFilterViewModel(
@@ -176,7 +176,6 @@ final class ShoppingResultsFilterViewModelTests {
     #expect(result == true)
     #expect(filterParameters?.distance == 3.0)
     #expect(filterParameters?.selectedStoreIds == [2])
-    #expect(filterParameters?.location == mockLocation)
   }
 
   @Test
@@ -199,7 +198,6 @@ final class ShoppingResultsFilterViewModelTests {
     #expect(result == true)
     #expect(filterParameters?.distance == 3.0)
     #expect(filterParameters?.selectedStoreIds == [])
-    #expect(filterParameters?.location == mockLocation)
   }
 
   // MARK: - Clear Filters Tests

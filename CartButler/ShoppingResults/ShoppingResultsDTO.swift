@@ -8,6 +8,7 @@ import Foundation
 
 struct ShoppingResultsDTO: Codable, Hashable, Identifiable {
   var id: Int { storeId }
+  let distance: Double?
   let storeId: Int
   let storeName: String
   let storeLocation: String

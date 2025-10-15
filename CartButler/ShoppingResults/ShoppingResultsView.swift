@@ -169,9 +169,15 @@ struct ShoppingResultsView: View {
         Text(result.storeName)
           .font(style.nameFont)
           .fontWeight(.bold)
-        Text(result.storeLocation)
-          .font(style.locationFont)
-          .foregroundColor(.secondary)
+        HStack(spacing: 4) {
+          Text(result.storeLocation)
+          if let distance = result.distance {
+            Text("•")
+            Text(Formatter.distance(kilometers: distance))
+          }
+        }
+        .font(style.locationFont)
+        .foregroundColor(.secondary)
       }
       Spacer()
       VStack(alignment: .trailing) {

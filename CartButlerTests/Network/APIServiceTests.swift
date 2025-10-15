@@ -38,6 +38,7 @@ struct APIServiceTests {
   )
 
   private let shoppingResultsDTO = ShoppingResultsDTO(
+    distance: nil,
     storeId: 1,
     storeName: "Test Store",
     storeLocation: "Test Location",

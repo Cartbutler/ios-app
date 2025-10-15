@@ -36,14 +36,17 @@ final class ShoppingResultsViewModel: ObservableObject {
 
   private let apiService: APIServiceProvider
   private let cartRepository: CartRepositoryProvider
+  private let locationService: LocationServiceProvider
   private(set) var availableStores = [StoreFilterDTO]()
 
   init(
     apiService: APIServiceProvider = APIService.shared,
-    cartRepository: CartRepositoryProvider = CartRepository.shared
+    cartRepository: CartRepositoryProvider = CartRepository.shared,
+    locationService: LocationServiceProvider = LocationService()
   ) {
     self.apiService = apiService
     self.cartRepository = cartRepository
+    self.locationService = locationService
   }
 
   func fetchResults() async {
@@ -51,27 +54,29 @@ final class ShoppingResultsViewModel: ObservableObject {
     state = .loading
 
     do {
-      if let cartId = try await cartRepository.cartPublisher.values.first()??.id {
-        allResults = try await apiService.fetchShoppingResults(
-          cartId: cartId,
-          storeIds: filterParameters?.storeIds,
-          radius: filterParameters?.radius,
-          lat: filterParameters?.latitude,
-          long: filterParameters?.longitude
-        )
-
-        // Store original store information if this is the first fetch
-        setOriginalStores(from: allResults)
-
-        if let cheapest = allResults.first {
-          state = .loaded(cheapest)
-          otherResults = Array(allResults.dropFirst())
-        } else {
-          state = .empty
-          otherResults = []
-        }
-      } else {
+      guard let cartId = try await cartRepository.cartPublisher.values.first()??.id else {
         state = .error("No items in cart")
+        return
+      }
+      let location = try? await locationService.getCurrentLocation()
+      
+      allResults = try await apiService.fetchShoppingResults(
+        cartId: cartId,
+        storeIds: filterParameters?.storeIds,
+        radius: filterParameters?.radius,
+        lat: location?.coordinate.latitude,
+        long: location?.coordinate.longitude
+      )
+
+      // Store original store information if this is the first fetch
+      setOriginalStores(from: allResults)
+
+      if let cheapest = allResults.first {
+        state = .loaded(cheapest)
+        otherResults = Array(allResults.dropFirst())
+      } else {
+        state = .empty
+        otherResults = []
       }
     } catch {
       state = .error("Failed to load shopping results: \(error.localizedDescription)")

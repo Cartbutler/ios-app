@@ -57,11 +57,10 @@ final class ShoppingResultsFilterViewModel: ObservableObject {
 
   func applyFilters() async -> Bool {
     do {
-      let location = try await locationService.getCurrentLocation()
+      try await locationService.getCurrentLocation()
       filterParameters = FilterParameters(
         distance: selectedRadius,
-        selectedStoreIds: Set(stores.filter(\.isSelected).map(\.id)),
-        location: location
+        selectedStoreIds: Set(stores.filter(\.isSelected).map(\.id))
       )
       return true
     } catch LocationError.locationUnavailable {

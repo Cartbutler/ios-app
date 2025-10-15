@@ -18,6 +18,7 @@ enum LocationError: Error {
 @Mockable
 @MainActor
 protocol LocationServiceProvider {
+  @discardableResult
   func getCurrentLocation() async throws -> CLLocation
 }
 
@@ -32,7 +33,8 @@ final class LocationService: NSObject, LocationServiceProvider {
     locationManager.delegate = self
     locationManager.desiredAccuracy = kCLLocationAccuracyBest
   }
-
+  
+  @discardableResult
   func getCurrentLocation() async throws -> CLLocation {
     switch locationManager.authorizationStatus {
     case .notDetermined:
