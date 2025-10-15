@@ -52,7 +52,7 @@ final class APIClient: APIClientProvider {
   static let shared = APIClient()
 
   static private let defaulURL = URL(
-    string: "https://southern-shard-449119-d4.nn.r.appspot.com")!
+    string: "https://cartbutler.duckdns.org/api")!
 
   private let baseURL: URL
   private let session: NetworkSession
