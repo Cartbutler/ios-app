@@ -5,7 +5,6 @@
 //  Created by Cassiano Monteiro on 2025-03-16.
 //
 
-import CoreLocation
 import Foundation
 
 struct FilterParameters {

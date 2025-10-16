@@ -163,32 +163,96 @@ struct ShoppingResultsView: View {
 
   private func storeCard(result: ShoppingResultsDTO, style: StoreRowStyle = .others) -> some View {
     HStack {
-      AsyncImageView(imagePath: result.storeImage, style: .original)
-        .frame(width: style.imageSize, height: style.imageSize)
-      VStack(alignment: .leading) {
-        Text(result.storeName)
-          .font(style.nameFont)
-          .fontWeight(.bold)
-        HStack(spacing: 4) {
-          Text(result.storeLocation)
-          if let distance = result.distance {
-            Text("•")
-            Text(Formatter.distance(kilometers: distance))
-          }
-        }
-        .font(style.locationFont)
-        .foregroundColor(.secondary)
-      }
+      storeImage(result: result, style: style)
+      storeInfo(result: result, style: style)
       Spacer()
-      VStack(alignment: .trailing) {
-        Text(Formatter.currency(with: result.total))
-          .font(style.priceFont)
-          .fontWeight(.bold)
-        Text("\(result.products.count) items")
-          .font(style.itemsFont)
-          .foregroundColor(.secondary)
+      priceInfo(result: result, style: style)
+    }
+  }
+
+  private func storeImage(result: ShoppingResultsDTO, style: StoreRowStyle) -> some View {
+    AsyncImageView(imagePath: result.storeImage, style: .original)
+      .frame(width: style.imageSize, height: style.imageSize)
+  }
+
+  private func storeInfo(result: ShoppingResultsDTO, style: StoreRowStyle) -> some View {
+    VStack(alignment: .leading, spacing: 4) {
+      Text(result.storeName)
+        .font(style.nameFont)
+        .fontWeight(.bold)
+      
+      locationInfo(result: result, style: style)
+      
+      if !result.isComplete {
+        missingItemsIndicator(result: result)
       }
     }
+  }
+
+  private func locationInfo(result: ShoppingResultsDTO, style: StoreRowStyle) -> some View {
+    HStack(spacing: 4) {
+      Text(result.storeLocation)
+      if let distance = result.distance {
+        Text("•")
+        Text(Formatter.distance(kilometers: distance))
+      }
+    }
+    .font(style.locationFont)
+    .foregroundColor(.secondary)
+  }
+
+  private func priceInfo(result: ShoppingResultsDTO, style: StoreRowStyle) -> some View {
+    VStack(alignment: .trailing, spacing: 4) {
+      Text(Formatter.currency(with: result.total))
+        .font(style.priceFont)
+        .fontWeight(.bold)
+      
+      itemsStatusIndicator(result: result, style: style)
+    }
+  }
+
+  private func itemsStatusIndicator(result: ShoppingResultsDTO, style: StoreRowStyle) -> some View {
+    Group {
+      if result.isComplete {
+        completeListBadge
+      } else {
+        incompleteItemsLabel(count: result.products.count, style: style)
+      }
+    }
+  }
+
+  private func incompleteItemsLabel(count: Int, style: StoreRowStyle) -> some View {
+    HStack(spacing: 2) {
+      Image(systemName: "exclamationmark.circle")
+        .font(.caption)
+        .foregroundColor(.orange)
+      Text("\(count) items")
+        .font(style.itemsFont)
+        .foregroundColor(.secondary)
+    }
+  }
+
+  private var completeListBadge: some View {
+    HStack(spacing: 2) {
+      Image(systemName: "checkmark.seal.fill")
+        .font(.caption)
+      Text("All items")
+        .font(.caption)
+        .fontWeight(.semibold)
+    }
+    .padding(.horizontal, 6)
+    .padding(.vertical, 2)
+    .background(
+      Capsule()
+        .fill(Color.green.opacity(0.15))
+    )
+    .foregroundColor(.green)
+  }
+
+  private func missingItemsIndicator(result: ShoppingResultsDTO) -> some View {
+    Text("Some items unavailable")
+      .font(.caption)
+      .foregroundColor(.orange)
   }
 
   private enum StoreRowStyle {

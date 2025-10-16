@@ -52,7 +52,8 @@ struct APIServiceTests {
         quantity: 2
       )
     ],
-    total: 19.98
+    total: 19.98,
+    isComplete: true
   )
 
   init() {

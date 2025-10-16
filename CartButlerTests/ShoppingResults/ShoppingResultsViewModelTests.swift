@@ -35,7 +35,8 @@ struct ShoppingResultsViewModelTests {
     storeAddress: "Address 1",
     storeImage: "",
     products: [],
-    total: 10.99
+    total: 10.99,
+    isComplete: true
   )
 
   private let otherResult1 = ShoppingResultsDTO(
@@ -46,7 +47,8 @@ struct ShoppingResultsViewModelTests {
     storeAddress: "Address 2",
     storeImage: "",
     products: [],
-    total: 12.99
+    total: 12.99,
+    isComplete: true
   )
 
   private let otherResult2 = ShoppingResultsDTO(
@@ -57,7 +59,8 @@ struct ShoppingResultsViewModelTests {
     storeAddress: "Address 3",
     storeImage: "",
     products: [],
-    total: 15.99
+    total: 15.99,
+    isComplete: true
   )
 
   private let sortedShoppingResults: [ShoppingResultsDTO]

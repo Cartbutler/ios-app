@@ -16,6 +16,7 @@ struct ShoppingResultsDTO: Codable, Hashable, Identifiable {
   let storeImage: String
   let products: [ProductDTO]
   let total: Double
+  let isComplete: Bool
 
   struct ProductDTO: Codable, Hashable, Identifiable {
     var id: Int { productId }
