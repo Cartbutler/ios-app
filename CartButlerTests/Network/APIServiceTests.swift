@@ -335,6 +335,7 @@ struct APIServiceTests {
         && $0?["store_ids"] == "1,2"
         && $0?["radius"] == "12.345"
         && $0?["user_location"] == "1.2,2.3"
+        && $0?["complete_only"] == "true"
     }
     given(mockAPIClient)
       .get(path: .value("shopping-results"), queryParameters: .matching(matcher))
@@ -346,7 +347,8 @@ struct APIServiceTests {
       storeIds: [1, 2],
       radius: 12.345,
       lat: 1.2,
-      long: 2.3
+      long: 2.3,
+      showCompleteOnly: true
     )
 
     // Then

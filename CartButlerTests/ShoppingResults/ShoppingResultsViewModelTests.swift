@@ -89,7 +89,7 @@ struct ShoppingResultsViewModelTests {
   func fetchResultsShouldSetLoadingState() async throws {
     // Given
     given(mockAPIService)
-      .fetchShoppingResults(cartId: .any, storeIds: .any, radius: .any, lat: .any, long: .any)
+      .fetchShoppingResults(cartId: .any, storeIds: .any, radius: .any, lat: .any, long: .any, showCompleteOnly: .any)
       .willReturn(sortedShoppingResults)
     #expect(sut.state == .idle)
 
@@ -124,7 +124,8 @@ struct ShoppingResultsViewModelTests {
         storeIds: .value(nil),
         radius: .value(nil),
         lat: .value(mockLocation.coordinate.latitude),
-        long: .value(mockLocation.coordinate.longitude)
+        long: .value(mockLocation.coordinate.longitude),
+        showCompleteOnly: .value(nil)
       )
       .willReturn(sortedShoppingResults)
 
@@ -149,7 +150,7 @@ struct ShoppingResultsViewModelTests {
   func fetchResultsFailureWithNetworkError() async throws {
     // Given
     given(mockAPIService)
-      .fetchShoppingResults(cartId: .any, storeIds: .any, radius: .any, lat: .any, long: .any)
+      .fetchShoppingResults(cartId: .any, storeIds: .any, radius: .any, lat: .any, long: .any, showCompleteOnly: .any)
       .willThrow(NetworkError.invalidResponse)
 
     #expect(sut.state == .idle)
@@ -191,7 +192,7 @@ struct ShoppingResultsViewModelTests {
     #expect(sut.allResults == [])
     #expect(sut.otherResults == [])
     verify(mockAPIService)
-      .fetchShoppingResults(cartId: .any, storeIds: .any, radius: .any, lat: .any, long: .any)
+      .fetchShoppingResults(cartId: .any, storeIds: .any, radius: .any, lat: .any, long: .any, showCompleteOnly: .any)
       .called(0)
   }
 
@@ -204,7 +205,8 @@ struct ShoppingResultsViewModelTests {
         storeIds: .value(nil),
         radius: .value(nil),
         lat: .value(mockLocation.coordinate.latitude),
-        long: .value(mockLocation.coordinate.longitude)
+        long: .value(mockLocation.coordinate.longitude),
+        showCompleteOnly: .value(nil)
       )
       .willReturn(sortedShoppingResults)
 
@@ -219,7 +221,8 @@ struct ShoppingResultsViewModelTests {
         storeIds: .value(nil),
         radius: .value(nil),
         lat: .value(mockLocation.coordinate.latitude),
-        long: .value(mockLocation.coordinate.longitude)
+        long: .value(mockLocation.coordinate.longitude),
+        showCompleteOnly: .value(nil)
       )
       .called(1)  // Should only be called once
   }
@@ -233,7 +236,8 @@ struct ShoppingResultsViewModelTests {
         storeIds: .value(nil),
         radius: .value(nil),
         lat: .value(mockLocation.coordinate.latitude),
-        long: .value(mockLocation.coordinate.longitude)
+        long: .value(mockLocation.coordinate.longitude),
+        showCompleteOnly: .value(nil)
       )
       .willReturn(sortedShoppingResults)
 
@@ -249,7 +253,8 @@ struct ShoppingResultsViewModelTests {
         storeIds: .value(nil),
         radius: .value(nil),
         lat: .value(mockLocation.coordinate.latitude),
-        long: .value(mockLocation.coordinate.longitude)
+        long: .value(mockLocation.coordinate.longitude),
+        showCompleteOnly: .value(nil)
       )
       .called(1)  // Should only be called once
   }
@@ -265,7 +270,8 @@ struct ShoppingResultsViewModelTests {
         storeIds: .value(nil),
         radius: .value(nil),
         lat: .value(mockLocation.coordinate.latitude),
-        long: .value(mockLocation.coordinate.longitude)
+        long: .value(mockLocation.coordinate.longitude),
+        showCompleteOnly: .value(nil)
       )
       .willReturn(sortedShoppingResults)
 
@@ -298,7 +304,8 @@ struct ShoppingResultsViewModelTests {
         storeIds: .value(nil),
         radius: .value(nil),
         lat: .value(mockLocation.coordinate.latitude),
-        long: .value(mockLocation.coordinate.longitude)
+        long: .value(mockLocation.coordinate.longitude),
+        showCompleteOnly: .value(nil)
       )
       .willReturn(singleResult)
 
@@ -325,7 +332,8 @@ struct ShoppingResultsViewModelTests {
         storeIds: .value(nil),
         radius: .value(nil),
         lat: .value(mockLocation.coordinate.latitude),
-        long: .value(mockLocation.coordinate.longitude)
+        long: .value(mockLocation.coordinate.longitude),
+        showCompleteOnly: .value(nil)
       )
       .willReturn([])
 
@@ -342,7 +350,7 @@ struct ShoppingResultsViewModelTests {
   func fetchResultsFailureShouldClearBothResults() async throws {
     // Given
     given(mockAPIService)
-      .fetchShoppingResults(cartId: .any, storeIds: .any, radius: .any, lat: .any, long: .any)
+      .fetchShoppingResults(cartId: .any, storeIds: .any, radius: .any, lat: .any, long: .any, showCompleteOnly: .any)
       .willThrow(NetworkError.invalidResponse)
 
     #expect(sut.allResults == [])
@@ -367,7 +375,8 @@ struct ShoppingResultsViewModelTests {
     // Given
     let filterParameters = FilterParameters(
       distance: 5.0,
-      selectedStoreIds: [1]
+      selectedStoreIds: [1],
+      showCompleteOnly: false
     )
 
     given(mockAPIService)
@@ -376,7 +385,8 @@ struct ShoppingResultsViewModelTests {
         storeIds: .value([1]),
         radius: .value(5.0),
         lat: .value(10),
-        long: .value(20)
+        long: .value(20),
+        showCompleteOnly: .value(false)
       )
       .willReturn(sortedShoppingResults)
 
@@ -403,7 +413,8 @@ struct ShoppingResultsViewModelTests {
         storeIds: .value(nil),
         radius: .value(nil),
         lat: .value(mockLocation.coordinate.latitude),
-        long: .value(mockLocation.coordinate.longitude)
+        long: .value(mockLocation.coordinate.longitude),
+        showCompleteOnly: .value(nil)
       )
       .willReturn(sortedShoppingResults)
     given(mockAPIService)
@@ -412,7 +423,8 @@ struct ShoppingResultsViewModelTests {
         storeIds: .value([1]),
         radius: .value(1),
         lat: .value(mockLocation.coordinate.latitude),
-        long: .value(mockLocation.coordinate.longitude)
+        long: .value(mockLocation.coordinate.longitude),
+        showCompleteOnly: .value(false)
       )
       .willReturn(otherResults)
 
@@ -420,7 +432,7 @@ struct ShoppingResultsViewModelTests {
     #expect(sut.state == .loaded(cheapestResult))
 
     // When
-    sut.filterParameters = FilterParameters(distance: 1, selectedStoreIds: [1])
+    sut.filterParameters = FilterParameters(distance: 1, selectedStoreIds: [1], showCompleteOnly: false)
     _ = await sut.$state.values.first { $0 == .loading }
 
     // Then
@@ -439,7 +451,8 @@ struct ShoppingResultsViewModelTests {
         storeIds: .any,
         radius: .any,
         lat: .any,
-        long: .any
+        long: .any,
+        showCompleteOnly: .any
       )
       .willReturn([])
     sut.filterParameters = nil
@@ -457,12 +470,14 @@ struct ShoppingResultsViewModelTests {
         storeIds: .any,
         radius: .any,
         lat: .any,
-        long: .any
+        long: .any,
+        showCompleteOnly: .any
       )
       .willReturn([])
     let filterParameters = FilterParameters(
       distance: 5.0,
-      selectedStoreIds: [1]
+      selectedStoreIds: [1],
+      showCompleteOnly: false
     )
 
     // When
@@ -481,7 +496,8 @@ struct ShoppingResultsViewModelTests {
         storeIds: .value(nil),
         radius: .value(nil),
         lat: .value(mockLocation.coordinate.latitude),
-        long: .value(mockLocation.coordinate.longitude)
+        long: .value(mockLocation.coordinate.longitude),
+        showCompleteOnly: .value(nil)
       )
       .willReturn([])
 
@@ -503,7 +519,8 @@ struct ShoppingResultsViewModelTests {
         storeIds: .value(nil),
         radius: .value(nil),
         lat: .value(mockLocation.coordinate.latitude),
-        long: .value(mockLocation.coordinate.longitude)
+        long: .value(mockLocation.coordinate.longitude),
+        showCompleteOnly: .value(nil)
       )
       .willReturn(sortedShoppingResults)
 
@@ -525,12 +542,14 @@ struct ShoppingResultsViewModelTests {
         storeIds: .any,
         radius: .any,
         lat: .any,
-        long: .any
+        long: .any,
+        showCompleteOnly: .any
       )
       .willReturn([])
     let filterParameters = FilterParameters(
       distance: 5.0,
-      selectedStoreIds: [1]
+      selectedStoreIds: [1],
+      showCompleteOnly: false
     )
 
     // When
@@ -557,7 +576,8 @@ struct ShoppingResultsViewModelTests {
         storeIds: .value(nil),
         radius: .value(nil),
         lat: .value(mockLocation.coordinate.latitude),
-        long: .value(mockLocation.coordinate.longitude)
+        long: .value(mockLocation.coordinate.longitude),
+        showCompleteOnly: .value(nil)
       )
       .willReturn(sortedShoppingResults)
 
@@ -588,7 +608,8 @@ struct ShoppingResultsViewModelTests {
         storeIds: .value(nil),
         radius: .value(nil),
         lat: .value(mockLocation.coordinate.latitude),
-        long: .value(mockLocation.coordinate.longitude)
+        long: .value(mockLocation.coordinate.longitude),
+        showCompleteOnly: .value(nil)
       )
       .willReturn(sortedShoppingResults)
 
@@ -610,7 +631,8 @@ struct ShoppingResultsViewModelTests {
         storeIds: .value(nil),
         radius: .value(nil),
         lat: .value(mockLocation.coordinate.latitude),
-        long: .value(mockLocation.coordinate.longitude)
+        long: .value(mockLocation.coordinate.longitude),
+        showCompleteOnly: .value(nil)
       )
       .willReturn([])
 

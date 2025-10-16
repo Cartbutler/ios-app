@@ -19,14 +19,19 @@ protocol APIServiceProvider: Sendable {
   func fetchCart() async throws -> CartDTO
   func addToCart(productId: Int, quantity: Int) async throws -> CartDTO
   func fetchShoppingResults(
-    cartId: Int, storeIds: [Int]?, radius: Double?, lat: Double?, long: Double?
+    cartId: Int,
+    storeIds: [Int]?,
+    radius: Double?,
+    lat: Double?,
+    long: Double?,
+    showCompleteOnly: Bool?
   ) async throws -> [ShoppingResultsDTO]
 }
 
 extension APIServiceProvider {
   func fetchShoppingResults(cartId: Int) async throws -> [ShoppingResultsDTO] {
     try await fetchShoppingResults(
-      cartId: cartId, storeIds: nil, radius: nil, lat: nil, long: nil
+      cartId: cartId, storeIds: nil, radius: nil, lat: nil, long: nil, showCompleteOnly: nil
     )
   }
 }
@@ -82,13 +87,19 @@ final class APIService: APIServiceProvider {
   }
 
   func fetchShoppingResults(
-    cartId: Int, storeIds: [Int]?, radius: Double?, lat: Double?, long: Double?
+    cartId: Int,
+    storeIds: [Int]?,
+    radius: Double?,
+    lat: Double?,
+    long: Double?,
+    showCompleteOnly: Bool?
   ) async throws -> [ShoppingResultsDTO] {
     var queryParameters = try await ["cart_id": String(cartId), "user_id": sessionID]
     queryParameters["radius"] = radius.flatMap { String($0) }
     queryParameters["store_ids"] = storeIds?.map(String.init).joined(separator: ",")
     queryParameters["user_location"] = [lat, long].compactMap { $0 }.map { String($0) }.joined(
       separator: ",")
+    queryParameters["complete_only"] = showCompleteOnly.flatMap { String($0) }
 
     return try await apiClient.get(
       path: "shopping-results",

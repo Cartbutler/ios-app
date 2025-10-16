@@ -21,6 +21,7 @@ final class ShoppingResultsFilterViewModel: ObservableObject {
   @Published var showLocationUnavailableAlert = false
   @Published var selectedRadius: Double
   @Published var stores: [StoreFilterDTO]
+  @Published var showCompleteOnly = false
   @Binding private var filterParameters: FilterParameters?
   private let locationService: LocationServiceProvider
 
@@ -60,7 +61,8 @@ final class ShoppingResultsFilterViewModel: ObservableObject {
       try await locationService.getCurrentLocation()
       filterParameters = FilterParameters(
         distance: selectedRadius,
-        selectedStoreIds: Set(stores.filter(\.isSelected).map(\.id))
+        selectedStoreIds: Set(stores.filter(\.isSelected).map(\.id)),
+        showCompleteOnly: showCompleteOnly
       )
       return true
     } catch LocationError.locationUnavailable {

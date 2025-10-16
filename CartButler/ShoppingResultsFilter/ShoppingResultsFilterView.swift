@@ -22,15 +22,26 @@ struct ShoppingResultsFilterView: View {
   }
 
   var body: some View {
-    ScrollView {
-      VStack(spacing: 16) {
-        distanceSection
-        storesSection
-        Spacer()
+    VStack(spacing: 0) {
+      ScrollView {
+        VStack(spacing: 16) {
+          completeListSection
+          distanceSection
+          storesSection
+        }
+        .padding(.vertical)
+      }
+      
+      // Sticky buttons section
+      VStack(spacing: 12) {
+        Divider()
+        
         applyButton
         clearButton
       }
-      .padding(.vertical)
+      .padding(.horizontal)
+      .padding(.bottom)
+      .background(Color.themeBackground)
     }
     .navigationTitle("Filter Results")
     .navigationBarTitleDisplayMode(.inline)
@@ -63,6 +74,30 @@ struct ShoppingResultsFilterView: View {
       message: {
         Text("Unable to get your current location. Please try again later.")
       })
+  }
+
+  private var completeListSection: some View {
+    VStack(alignment: .leading, spacing: 8) {
+      Text("Availability")
+        .font(.title3)
+        .fontWeight(.semibold)
+      
+      Toggle(isOn: $viewModel.showCompleteOnly) {
+        HStack(spacing: 8) {
+          Image(systemName: "checkmark.seal.fill")
+            .foregroundColor(.green)
+          Text("Show only stores with all items")
+            .font(.body)
+        }
+      }
+      .tint(.themePrimary)
+    }
+    .padding()
+    .background(
+      RoundedRectangle(cornerRadius: 12)
+        .fill(Color.themeSurface)
+    )
+    .padding(.horizontal)
   }
 
   private var distanceSection: some View {
@@ -150,7 +185,6 @@ struct ShoppingResultsFilterView: View {
     }
     .foregroundStyle(.onPrimary)
     .buttonStyle(.borderedProminent)
-    .padding(.horizontal)
   }
 
   private var clearButton: some View {
@@ -164,7 +198,6 @@ struct ShoppingResultsFilterView: View {
     }
     .foregroundStyle(.secondaryVariant)
     .buttonStyle(.bordered)
-    .padding(.horizontal)
   }
 
   @ToolbarContentBuilder

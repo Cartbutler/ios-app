@@ -65,7 +65,8 @@ final class ShoppingResultsViewModel: ObservableObject {
         storeIds: filterParameters?.storeIds,
         radius: filterParameters?.radius,
         lat: location?.coordinate.latitude,
-        long: location?.coordinate.longitude
+        long: location?.coordinate.longitude,
+        showCompleteOnly: filterParameters?.showCompleteOnly
       )
 
       // Store original store information if this is the first fetch

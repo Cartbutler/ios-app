@@ -23,29 +23,14 @@ final class FilterParametersTests {
     // When
     let sut = FilterParameters(
       distance: distance,
-      selectedStoreIds: storeIds
+      selectedStoreIds: storeIds,
+      showCompleteOnly: true
     )
 
     // Then
     #expect(sut.distance == distance)
     #expect(sut.selectedStoreIds == storeIds)
-  }
-
-  @Test
-  func initWithNoLocationShouldSetValuesCorrectly() {
-    // Given
-    let distance = 5.0
-    let storeIds: Set<Int> = [1, 2, 3]
-
-    // When
-    let sut = FilterParameters(
-      distance: distance,
-      selectedStoreIds: storeIds
-    )
-
-    // Then
-    #expect(sut.distance == distance)
-    #expect(sut.selectedStoreIds == storeIds)
+    #expect(sut.showCompleteOnly)
   }
 
   // MARK: - Computed Properties Tests
@@ -56,7 +41,8 @@ final class FilterParametersTests {
     let storeIds: Set<Int> = [1, 2, 3]
     let sut = FilterParameters(
       distance: 5.0,
-      selectedStoreIds: storeIds
+      selectedStoreIds: storeIds,
+      showCompleteOnly: false
     )
 
     // When
@@ -75,7 +61,8 @@ final class FilterParametersTests {
     let distance = 5.0
     let sut = FilterParameters(
       distance: distance,
-      selectedStoreIds: []
+      selectedStoreIds: [],
+      showCompleteOnly: false
     )
 
     // When

@@ -54,7 +54,7 @@ final class ShoppingResultsFilterViewModelTests {
   func initWithFilterParametersShouldSetValuesFromParameters() async {
     // Given
     let stores = [makeStore(id: 1), makeStore(id: 2)]
-    filterParameters = FilterParameters(distance: 5.0, selectedStoreIds: [1])
+    filterParameters = FilterParameters(distance: 5.0, selectedStoreIds: [1], showCompleteOnly: false)
 
     // When
     let sut = ShoppingResultsFilterViewModel(

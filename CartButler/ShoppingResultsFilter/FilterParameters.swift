@@ -10,6 +10,7 @@ import Foundation
 struct FilterParameters {
   let distance: Double
   let selectedStoreIds: Set<Int>
+  let showCompleteOnly: Bool
 
   var storeIds: [Int] { Array(selectedStoreIds) }
   var radius: Double? { distance }
