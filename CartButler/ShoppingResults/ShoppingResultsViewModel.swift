@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 @MainActor
 final class ShoppingResultsViewModel: ObservableObject {
@@ -15,14 +16,14 @@ final class ShoppingResultsViewModel: ObservableObject {
     case empty
     case loading
     case loaded(ShoppingResultsDTO)
-    case error(String)
+    case error(LocalizedStringKey)
   }
 
   private(set) var allResults = [ShoppingResultsDTO]()
   @Published private(set) var otherResults = [ShoppingResultsDTO]()
   @Published private(set) var state = State.idle {
     didSet {
-      if case .error(let message) = state, !message.isEmpty { showAlert = true }
+      if case .error = state { showAlert = true }
     }
   }
   @Published var showAlert = false

@@ -7,11 +7,12 @@
 
 import Combine
 import Foundation
+import SwiftUI
 
 @MainActor
 final class CartViewModel: ObservableObject {
   @Published var cart: CartDTO?
-  @Published var errorMessage: String?
+  @Published var errorMessage: LocalizedStringKey?
   @Published var showAlert = false
 
   private let cartRepository: CartRepositoryProvider

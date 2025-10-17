@@ -44,7 +44,7 @@ struct ProductsResultsView: View {
     ProgressView("Loading products...")
   }
 
-  private func errorView(message: String) -> some View {
+  private func errorView(message: LocalizedStringKey) -> some View {
     ErrorView(message: message) {
       await viewModel.fetchProducts()
     }

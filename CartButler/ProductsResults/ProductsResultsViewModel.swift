@@ -4,7 +4,9 @@
 //
 //  Created by Cassiano Monteiro on 2025-02-12.
 //
+
 import Foundation
+import SwiftUI
 
 enum SearchType {
   case query(String)
@@ -15,7 +17,7 @@ enum SearchType {
 final class ProductsResultsViewModel: ObservableObject {
   @Published var products: [BasicProductDTO] = []
   @Published var isLoading = false
-  @Published var errorMessage: String?
+  @Published var errorMessage: LocalizedStringKey?
 
   private let apiService: APIServiceProvider
   private let searchType: SearchType

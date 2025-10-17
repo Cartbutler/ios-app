@@ -7,13 +7,14 @@
 
 import Combine
 import Foundation
+import SwiftUI
 
 @MainActor
 final class ProductDetailsViewModel: ObservableObject {
   @Published var product: ProductDTO?
   @Published var isLoading = false
-  @Published var errorMessage: String?
-  @Published var alertMessage: String?
+  @Published var errorMessage: LocalizedStringKey?
+  @Published var alertMessage: LocalizedStringKey?
   @Published var showAlert = false
   @Published var quantityInCart = 0
 

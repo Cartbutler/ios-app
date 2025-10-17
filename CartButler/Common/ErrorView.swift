@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ErrorView: View {
-  let message: String
+  let message: LocalizedStringKey
   let retryAction: () async -> Void
 
   var body: some View {
