@@ -12,6 +12,7 @@ struct ProductDetailsView: View {
   private let product: BasicProductDTO
   @StateObject private var viewModel: ProductDetailsViewModel
   @State private var selectedQuantity = 0
+  @State private var isPerformingAction = false
 
   init(product: BasicProductDTO) {
     self.product = product
@@ -82,19 +83,41 @@ struct ProductDetailsView: View {
     .padding(.horizontal)
   }
   
+  private var currentCartState: CartState {
+    if viewModel.quantityInCart == 0 {
+      .notInCart
+    } else if selectedQuantity == 0 {
+      .removing
+    } else if selectedQuantity != viewModel.quantityInCart {
+      .updating
+    } else {
+      .inCart
+    }
+  }
+  
   @ViewBuilder
   private var cartActionSection: some View {
-    if viewModel.quantityInCart > 0 {
-      // Show quantity picker with cart button
-      HStack(spacing: 12) {
-        quantityPicker
-        cartButton
+    Group {
+      switch currentCartState {
+      case .notInCart:
+        cartActionButton(state: .notInCart) {
+          await performCartAction {
+            await viewModel.addToCart()
+          }
+        }
+      case .inCart, .updating, .removing:
+        HStack(spacing: 12) {
+          quantityPicker
+            .disabled(isPerformingAction)
+          cartActionButton(state: currentCartState) {
+            await performCartAction {
+              await viewModel.updateCartQuantity(to: selectedQuantity)
+            }
+          }
+        }
       }
-      .padding(.horizontal, 16)
-    } else {
-      // Show add to cart button only
-      addToCartButton
     }
+    .padding(.horizontal, 16)
   }
   
   private var quantityPicker: some View {
@@ -111,38 +134,27 @@ struct ProductDetailsView: View {
     .background(Color(.themeSurface))
     .cornerRadius(8)
   }
-
-  private var addToCartButton: some View {
-    Button {
-      Task { await viewModel.addToCart() }
-    } label: {
-      Label("Add to Cart", systemImage: "cart")
-        .frame(maxWidth: .infinity)
-        .padding(8)
-    }
-    .foregroundStyle(.onPrimary)
-    .buttonStyle(.borderedProminent)
-  }
   
   @ViewBuilder
-  private var cartButton: some View {
-    let isUpdateNeeded = selectedQuantity != viewModel.quantityInCart
-    
+  private func cartActionButton(state: CartState, action: @escaping () async -> Void) -> some View {
     Button {
-      Task { await viewModel.updateCartQuantity(to: selectedQuantity) }
+      Task { await action() }
     } label: {
-      Label(
-        isUpdateNeeded ? "Update Cart" : "In Cart",
-        systemImage: isUpdateNeeded ? "cart.fill" : "cart.circle.fill"
-      )
+      HStack {
+        if isPerformingAction {
+          ProgressView()
+        }
+        Label(state.buttonTitle, systemImage: state.buttonIcon)
+      }
       .frame(maxWidth: .infinity)
       .padding(8)
     }
-    .foregroundStyle(.onPrimary)
+    .foregroundStyle(isPerformingAction || state.isDisabled ? .onSurface : .onPrimary)
     .buttonStyle(.borderedProminent)
-    .disabled(!isUpdateNeeded)
+    .disabled(state.isDisabled || isPerformingAction)
   }
-
+  
+  @ViewBuilder
   private func storePriceCard(_ store: StoreDTO) -> some View {
     HStack {
       AsyncImageView(imagePath: store.storeImage, style: .original)
@@ -154,5 +166,42 @@ struct ProductDetailsView: View {
       Text(Formatter.currency(with: store.price))
         .font(.subheadline)
     }
+  }
+  
+  private func performCartAction(_ action: () async -> Void) async {
+    isPerformingAction = true
+    await action()
+    isPerformingAction = false
+  }
+}
+
+// MARK: - Cart State Management
+
+private enum CartState {
+  case notInCart
+  case inCart
+  case updating
+  case removing
+  
+  var buttonTitle: LocalizedStringKey {
+    switch self {
+    case .notInCart: "Add to Cart"
+    case .inCart: "In Cart"
+    case .updating: "Update Cart"
+    case .removing: "Remove from Cart"
+    }
+  }
+  
+  var buttonIcon: String {
+    switch self {
+    case .notInCart: "cart"
+    case .inCart: "cart.circle.fill"
+    case .updating: "cart.fill"
+    case .removing: "cart.badge.minus"
+    }
+  }
+  
+  var isDisabled: Bool {
+    self == .inCart
   }
 }
