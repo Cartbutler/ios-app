@@ -4,6 +4,8 @@
 //
 //  Created by Cassiano Monteiro on 2025-02-21.
 //
+
+import Combine
 import Foundation
 
 @MainActor
@@ -13,10 +15,12 @@ final class ProductDetailsViewModel: ObservableObject {
   @Published var errorMessage: String?
   @Published var alertMessage: String?
   @Published var showAlert = false
+  @Published var quantityInCart = 0
 
   private let apiService: APIServiceProvider
   private let cartRepository: CartRepositoryProvider
   private let productID: Int
+  private var cartSubscription: AnyCancellable?
 
   init(
     apiService: APIServiceProvider = APIService.shared,
@@ -26,6 +30,17 @@ final class ProductDetailsViewModel: ObservableObject {
     self.apiService = apiService
     self.cartRepository = cartRepository
     self.productID = productID
+    
+    // Subscribe to cart changes
+    setupCartSubscription()
+  }
+  
+  private func setupCartSubscription() {
+    cartSubscription = cartRepository.cartPublisher
+      .sink { @MainActor [weak self] cart in
+        guard let self else { return }
+        quantityInCart = cart?.quantity(for: productID) ?? 0
+      }
   }
 
   func fetchProduct() async {
