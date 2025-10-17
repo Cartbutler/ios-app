@@ -40,6 +40,10 @@ struct ProductDetailsViewModelTests {
       .cartPublisher
       .willReturn(cartPublisher.eraseToAnyPublisher())
     
+//    given(mockCartRepository)
+//      .refreshCart()
+//      .willReturn()
+    
     sut = ProductDetailsViewModel(
       apiService: mockService,
       cartRepository: mockCartRepository,

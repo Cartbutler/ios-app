@@ -6,6 +6,7 @@
 //
 
 import Combine
+import Foundation
 import Mockable
 
 @globalActor
@@ -19,6 +20,7 @@ protocol CartRepositoryProvider: Sendable {
   func refreshCart() async throws
   func increment(productId: Int) async throws
   func decrement(productId: Int) async throws
+  func setQuantity(productId: Int, quantity: Int) async throws
   func removeFromCart(productId: Int) async throws
 }
 
@@ -29,7 +31,9 @@ final class CartRepository: CartRepositoryProvider, @unchecked Sendable {
   @CartActor @Published private var cart: CartDTO?
 
   var cartPublisher: AnyPublisher<CartDTO?, Never> {
-    $cart.eraseToAnyPublisher()
+    $cart
+      .receive(on: DispatchQueue.main)
+      .eraseToAnyPublisher()
   }
 
   private let apiService: APIServiceProvider
@@ -55,6 +59,12 @@ final class CartRepository: CartRepositoryProvider, @unchecked Sendable {
   func decrement(productId: Int) async throws {
     try await addToCart(productId: productId, increment: -1)
   }
+  
+  
+  @CartActor
+  func setQuantity(productId: Int, quantity: Int) async throws {
+    try await addToCart(productId: productId, setQuantity: quantity)
+  }
 
   @CartActor
   func removeFromCart(productId: Int) async throws {
@@ -79,7 +89,7 @@ final class CartRepository: CartRepositoryProvider, @unchecked Sendable {
   }
 
   @CartActor
-  private func addToCart(productId: Int, increment: Int) async throws {
+  private func addToCart(productId: Int, increment: Int = 0, setQuantity: Int? = nil) async throws {
     addToCartTask?.cancel()
     addToCartTask = Task {
       // Handle any pending temp items first
@@ -89,8 +99,11 @@ final class CartRepository: CartRepositoryProvider, @unchecked Sendable {
       // If no temp item exists, get the item from the current cart.
       // If the item is not in the cart, default to 0.
       let itemFromCart = cart?.cartItems.first { $0.productId == productId }
-      tempItems[productId] = (tempItems[productId] ?? itemFromCart?.quantity ?? 0) + increment
-      guard let quantity = tempItems[productId], quantity >= 0 else { return }
+      if let setQuantity {
+        tempItems[productId] = setQuantity
+      } else {
+        tempItems[productId] = (tempItems[productId] ?? itemFromCart?.quantity ?? 0) + increment
+      }
 
       // Debounce consecutive calls to avoid multiple network requests
       try await Task.sleep(for: .seconds(0.5))

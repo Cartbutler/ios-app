@@ -11,6 +11,7 @@ struct ProductDetailsView: View {
 
   private let product: BasicProductDTO
   @StateObject private var viewModel: ProductDetailsViewModel
+  @State private var selectedQuantity = 0
 
   init(product: BasicProductDTO) {
     self.product = product
@@ -40,6 +41,9 @@ struct ProductDetailsView: View {
     .task {
       await viewModel.fetchProduct()
     }
+    .onChange(of: viewModel.quantityInCart, initial: true) { _, newValue in
+      selectedQuantity = newValue
+    }
   }
 
   private func productView(product: ProductDTO) -> some View {
@@ -51,7 +55,7 @@ struct ProductDetailsView: View {
           Spacer()
         }
       }
-      addToCartButton
+      cartActionSection
         .padding(.bottom, 8)
     }
     .ignoresSafeArea(edges: .top)
@@ -77,6 +81,36 @@ struct ProductDetailsView: View {
     }
     .padding(.horizontal)
   }
+  
+  @ViewBuilder
+  private var cartActionSection: some View {
+    if viewModel.quantityInCart > 0 {
+      // Show quantity picker with cart button
+      HStack(spacing: 12) {
+        quantityPicker
+        cartButton
+      }
+      .padding(.horizontal, 16)
+    } else {
+      // Show add to cart button only
+      addToCartButton
+    }
+  }
+  
+  private var quantityPicker: some View {
+    Picker("Quantity", selection: $selectedQuantity) {
+      ForEach(0...10, id: \.self) { quantity in
+        Text("\(quantity)").tag(quantity)
+      }
+    }
+    .frame(minWidth: 100)
+    .pickerStyle(.menu)
+    .tint(.primary)
+    .padding(.vertical, 4)
+    .padding(.horizontal, 8)
+    .background(Color(.themeSurface))
+    .cornerRadius(8)
+  }
 
   private var addToCartButton: some View {
     Button {
@@ -88,7 +122,25 @@ struct ProductDetailsView: View {
     }
     .foregroundStyle(.onPrimary)
     .buttonStyle(.borderedProminent)
-    .padding(.horizontal, 16)
+  }
+  
+  @ViewBuilder
+  private var cartButton: some View {
+    let isUpdateNeeded = selectedQuantity != viewModel.quantityInCart
+    
+    Button {
+      Task { await viewModel.updateCartQuantity(to: selectedQuantity) }
+    } label: {
+      Label(
+        isUpdateNeeded ? "Update Cart" : "In Cart",
+        systemImage: isUpdateNeeded ? "cart.fill" : "cart.circle.fill"
+      )
+      .frame(maxWidth: .infinity)
+      .padding(8)
+    }
+    .foregroundStyle(.onPrimary)
+    .buttonStyle(.borderedProminent)
+    .disabled(!isUpdateNeeded)
   }
 
   private func storePriceCard(_ store: StoreDTO) -> some View {

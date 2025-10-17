@@ -65,4 +65,13 @@ final class ProductDetailsViewModel: ObservableObject {
       showAlert = true
     }
   }
+  
+  func updateCartQuantity(to newQuantity: Int) async {
+    do {
+      try await cartRepository.setQuantity(productId: productID, quantity: newQuantity)
+    } catch {
+      alertMessage = "Failed to update cart, please try again."
+      showAlert = true
+    }
+  }
 }
