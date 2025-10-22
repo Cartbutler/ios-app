@@ -8,14 +8,14 @@ import SwiftData
 import SwiftUI
 
 struct SearchView: View {
+  @EnvironmentObject private var coordinator: TabCoordinator
   @StateObject private var viewModel = SearchViewModel()
-  @State private var presentSearchResults = false
 
   @Query(sort: \Category.name)
   private var categories: [Category]
 
   var body: some View {
-    NavigationStack {
+    NavigationStack(path: $coordinator.searchPath) {
       withAnimation {
         Group {
           if categories.isEmpty {
@@ -25,16 +25,14 @@ struct SearchView: View {
           }
         }
       }
-      .navigationDestination(isPresented: $presentSearchResults) {
-        ProductsResultsView(searchType: .query(viewModel.query))
-      }
+      .withAppNavigation()
       .navigationTitle("CartButler")
       .navigationBarTitleDisplayMode(.inline)
       .toolbarBackground(.themePrimary, for: .navigationBar)
     }
     .searchable(text: $viewModel.searchKey, prompt: "Search products")
     .onSubmit(of: .search) {
-      presentSearchResults = true
+      coordinator.navigate(to: SearchType.query(viewModel.query))
     }
     .searchSuggestions {
       SuggestionsView(searchKey: $viewModel.searchKey, query: viewModel.query)
@@ -50,8 +48,8 @@ struct SearchView: View {
     ScrollView {
       LazyVGrid(columns: [.init(.adaptive(minimum: 150))], spacing: 8) {
         ForEach(categories) { category in
-          NavigationLink {
-            ProductsResultsView(searchType: .category(category))
+          Button {
+            coordinator.navigate(to: SearchType.category(category))
           } label: {
             CategoryTile(category: category)
           }

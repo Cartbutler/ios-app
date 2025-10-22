@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ShoppingResultsView: View {
+  @EnvironmentObject private var coordinator: TabCoordinator
   @StateObject private var viewModel = ShoppingResultsViewModel()
   @State private var isFilterSheetPresented = false
 
@@ -155,7 +156,9 @@ struct ShoppingResultsView: View {
   }
 
   private func storeRow(result: ShoppingResultsDTO, style: StoreRowStyle = .others) -> some View {
-    NavigationLink(destination: StoreDetailsView(result: result)) {
+    Button {
+      coordinator.navigate(to: result)
+    } label: {
       storeCard(result: result, style: style)
     }
     .buttonStyle(.plain)

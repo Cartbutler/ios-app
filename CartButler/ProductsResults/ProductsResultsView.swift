@@ -7,6 +7,7 @@
 import SwiftUI
 
 struct ProductsResultsView: View {
+  @EnvironmentObject private var coordinator: TabCoordinator
   @StateObject private var viewModel: ProductsResultsViewModel
 
   private let columns = [
@@ -65,8 +66,8 @@ struct ProductsResultsView: View {
     ScrollView {
       LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 16) {
         ForEach(viewModel.products) { product in
-          NavigationLink {
-            ProductDetailsView(product: product)
+          Button {
+            coordinator.navigate(to: product)
           } label: {
             ProductTile(product: product)
           }

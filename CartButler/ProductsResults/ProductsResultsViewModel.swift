@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-enum SearchType {
+enum SearchType: Hashable {
   case query(String)
   case category(Category)
 }

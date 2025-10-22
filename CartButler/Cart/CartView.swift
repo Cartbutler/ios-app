@@ -8,10 +8,11 @@
 import SwiftUI
 
 struct CartView: View {
+  @EnvironmentObject private var coordinator: TabCoordinator
   @StateObject private var viewModel = CartViewModel()
 
   var body: some View {
-    NavigationStack {
+    NavigationStack(path: $coordinator.cartPath) {
       withAnimation {
         Group {
           if let cart = viewModel.cart {
@@ -26,6 +27,7 @@ struct CartView: View {
           }
         }
       }
+      .withAppNavigation()
       .navigationTitle("Cart")
       .navigationBarTitleDisplayMode(.inline)
     }
@@ -72,8 +74,8 @@ struct CartView: View {
   }
 
   private var shoppingResultsButton: some View {
-    NavigationLink {
-      ShoppingResultsView()
+    Button {
+      coordinator.navigate(to: AppDestination.shoppingResults)
     } label: {
       Label("Compare Prices", systemImage: "cart.badge.questionmark")
         .frame(maxWidth: .infinity)

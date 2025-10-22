@@ -10,6 +10,8 @@ import SwiftUI
 
 @main
 struct CartButlerApp: App {
+  @StateObject private var coordinator = TabCoordinator()
+  
   var body: some Scene {
     WindowGroup {
       if !isRunningTests {
@@ -19,6 +21,7 @@ struct CartButlerApp: App {
       }
     }
     .modelContainer(MainContainer.shared)
+    .environmentObject(coordinator)
   }
 
   private var isRunningTests: Bool {
