@@ -35,6 +35,10 @@ struct MainView: View {
     .onAppear {
       viewModel.viewDidAppear()
     }
+    .sheet(item: $coordinator.activeSheet) { destination in
+      destination.view
+        .environmentObject(coordinator)
+    }
   }
 }
 

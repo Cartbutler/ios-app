@@ -7,6 +7,7 @@
 import Combine
 import Foundation
 import Mockable
+import SwiftUI
 import Testing
 
 @testable import CartButler
@@ -33,6 +34,16 @@ struct MockData {
     name: String = "Test Category"
   ) -> CartButler.Category {
     Category(id: id, name: name, imagePath: "")
+  }
+  
+  static func stores(count: Int = 1) -> [StoreFilterDTO] {
+    (1...count).map {
+      StoreFilterDTO(id: $0, name: "Store \($0)", imagePath: "", isSelected: false)
+    }
+  }
+  
+  static func filterParameters() -> FilterParameters {
+    FilterParameters(distance: 0, selectedStoreIds: [], showCompleteOnly: false)
   }
 }
 
@@ -422,5 +433,265 @@ struct TabCoordinatorTests {
     #expect(coordinator.searchPath.count == 50)
     #expect(coordinator.cartPath.count == 50)
     #expect(coordinator.accountPath.isEmpty)
+  }
+  
+  // MARK: - Initial Sheet State Tests
+  
+  @Test("Initial state should have no active sheet")
+  func initialSheetState() {
+    let coordinator = TabCoordinator()
+    #expect(coordinator.activeSheet == nil)
+  }
+  
+  // MARK: - Sheet Presentation Tests
+  
+  @Test("Present sheet should set active sheet")
+  func presentSheet() {
+    let coordinator = TabCoordinator()
+    let stores = MockData.stores(count: 2)
+    let filterParams: Binding<FilterParameters?> = .constant(MockData.filterParameters())
+    
+    coordinator.presentSheet(
+      .shoppingResultsFilter(stores: stores, filterParameters: filterParams)
+    )
+    
+    #expect(coordinator.activeSheet != nil)
+    
+    if case .shoppingResultsFilter(let presentedStores, _) = coordinator.activeSheet {
+      #expect(presentedStores.count == 2)
+      #expect(presentedStores.first?.name == "Store 1")
+    } else {
+      Issue.record("Wrong sheet type presented")
+    }
+  }
+  
+  @Test("Dismiss sheet should clear active sheet")
+  func dismissSheet() {
+    let coordinator = TabCoordinator()
+    let stores = MockData.stores()
+    let filterParams: Binding<FilterParameters?> = .constant(MockData.filterParameters())
+    
+    coordinator.presentSheet(
+      .shoppingResultsFilter(stores: stores, filterParameters: filterParams)
+    )
+    #expect(coordinator.activeSheet != nil)
+    
+    coordinator.dismissSheet()
+    
+    #expect(coordinator.activeSheet == nil)
+  }
+  
+  @Test("Replace sheet should update active sheet")
+  func replaceSheet() {
+    let coordinator = TabCoordinator()
+    let initialStores = MockData.stores(count: 1)
+    let updatedStores = MockData.stores(count: 3)
+    let filterParams: Binding<FilterParameters?> = .constant(MockData.filterParameters())
+    
+    coordinator.presentSheet(
+      .shoppingResultsFilter(stores: initialStores, filterParameters: filterParams)
+    )
+    
+    coordinator.presentSheet(
+      .shoppingResultsFilter(stores: updatedStores, filterParameters: filterParams)
+    )
+    
+    #expect(coordinator.activeSheet != nil)
+    
+    if case .shoppingResultsFilter(let presentedStores, _) = coordinator.activeSheet {
+      #expect(presentedStores.count == 3)
+    } else {
+      Issue.record("Sheet not replaced correctly")
+    }
+  }
+  
+  // MARK: - Sheet Identity Tests
+  
+  @Test("Sheet destinations should have consistent identifiers")
+  func sheetIdentifiers() {
+    let stores = MockData.stores()
+    let filterParams: Binding<FilterParameters?> = .constant(MockData.filterParameters())
+    
+    let sheet1 = SheetDestination.shoppingResultsFilter(
+      stores: stores,
+      filterParameters: filterParams
+    )
+    let sheet2 = SheetDestination.shoppingResultsFilter(
+      stores: stores,
+      filterParameters: filterParams
+    )
+    
+    #expect(sheet1.id == sheet2.id)
+    #expect(sheet1.id == sheet1)
+  }
+  
+  // MARK: - Integration Tests
+  
+  @Test("Navigation and sheet should work independently")
+  func navigationAndSheetIndependence() {
+    let coordinator = TabCoordinator()
+    coordinator.selectedTab = .search
+    
+    // Navigate
+    let product = MockData.product()
+    coordinator.navigate(to: product)
+    
+    // Present sheet
+    let stores = MockData.stores()
+    let filterParams: Binding<FilterParameters?> = .constant(MockData.filterParameters())
+    coordinator.presentSheet(
+      .shoppingResultsFilter(stores: stores, filterParameters: filterParams)
+    )
+    
+    // Verify both states
+    #expect(coordinator.searchPath.count == 1)
+    #expect(coordinator.activeSheet != nil)
+    
+    // Dismiss sheet shouldn't affect navigation
+    coordinator.dismissSheet()
+    #expect(coordinator.activeSheet == nil)
+    #expect(coordinator.searchPath.count == 1)
+  }
+  
+  @Test("Navigate back should not affect sheet")
+  func navigateBackWithActiveSheet() {
+    let coordinator = TabCoordinator()
+    coordinator.selectedTab = .search
+    
+    // Setup navigation
+    let product = MockData.product()
+    coordinator.navigate(to: product)
+    #expect(coordinator.searchPath.count == 1)
+    
+    // Present sheet
+    let stores = MockData.stores()
+    let filterParams: Binding<FilterParameters?> = .constant(MockData.filterParameters())
+    coordinator.presentSheet(
+      .shoppingResultsFilter(stores: stores, filterParameters: filterParams)
+    )
+    
+    // Navigate back
+    coordinator.navigateBack()
+    
+    // Sheet should remain, navigation should be cleared
+    #expect(coordinator.activeSheet != nil)
+    #expect(coordinator.searchPath.isEmpty)
+  }
+  
+  @Test("Navigate to root should not affect sheet")
+  func navigateToRootWithActiveSheet() {
+    let coordinator = TabCoordinator()
+    coordinator.selectedTab = .search
+    
+    // Setup multiple navigation levels
+    coordinator.navigate(to: MockData.product(id: 1))
+    coordinator.navigate(to: MockData.product(id: 2))
+    coordinator.navigate(to: MockData.category())
+    #expect(coordinator.searchPath.count == 3)
+    
+    // Present sheet
+    let stores = MockData.stores()
+    let filterParams: Binding<FilterParameters?> = .constant(MockData.filterParameters())
+    coordinator.presentSheet(
+      .shoppingResultsFilter(stores: stores, filterParameters: filterParams)
+    )
+    
+    // Navigate to root
+    coordinator.navigateToRoot()
+    
+    // Sheet should remain, navigation should be cleared
+    #expect(coordinator.activeSheet != nil)
+    #expect(coordinator.searchPath.isEmpty)
+  }
+  
+  @Test("Switch tab should not affect sheet")
+  func switchTabWithActiveSheet() {
+    let coordinator = TabCoordinator()
+    
+    // Start on search tab and present sheet
+    coordinator.selectedTab = .search
+    let stores = MockData.stores()
+    let filterParams: Binding<FilterParameters?> = .constant(MockData.filterParameters())
+    coordinator.presentSheet(
+      .shoppingResultsFilter(stores: stores, filterParameters: filterParams)
+    )
+    
+    // Switch to cart tab
+    coordinator.switchTab(to: .cart)
+    
+    // Sheet should remain active
+    #expect(coordinator.activeSheet != nil)
+    #expect(coordinator.selectedTab == .cart)
+  }
+  
+  // MARK: - Published Property Tests
+  
+  @Test("Active sheet changes should be published")
+  func activeSheetPublishing() {
+    let coordinator = TabCoordinator()
+    
+    // Verify initial state
+    #expect(coordinator.activeSheet == nil)
+    
+    // Present sheet
+    let stores = MockData.stores()
+    let filterParams: Binding<FilterParameters?> = .constant(MockData.filterParameters())
+    coordinator.presentSheet(
+      .shoppingResultsFilter(stores: stores, filterParameters: filterParams)
+    )
+    
+    // Verify sheet is presented
+    #expect(coordinator.activeSheet != nil)
+    
+    // Dismiss sheet
+    coordinator.dismissSheet()
+    
+    // Verify sheet is dismissed
+    #expect(coordinator.activeSheet == nil)
+  }
+
+  // MARK: - Extended TabCoordinator Tests for Sheets
+  
+  @Test("Complex navigation scenario with sheets")
+  func complexNavigationWithSheets() async {
+    let coordinator = TabCoordinator()
+    
+    // 1. Start on search tab
+    coordinator.selectedTab = .search
+    #expect(coordinator.selectedTab == .search)
+    
+    // 2. Navigate to a product
+    let product = MockData.product()
+    coordinator.navigate(to: product)
+    #expect(coordinator.searchPath.count == 1)
+    
+    // 3. Present a sheet
+    let stores = MockData.stores(count: 2)
+    let filterParams: Binding<FilterParameters?> = .constant(MockData.filterParameters())
+    coordinator.presentSheet(
+      .shoppingResultsFilter(stores: stores, filterParameters: filterParams)
+    )
+    #expect(coordinator.activeSheet != nil)
+    
+    // 4. Switch to cart tab with navigation
+    let cartProduct = MockData.product(id: 2, name: "Cart Product")
+    coordinator.switchTab(to: .cart, then: cartProduct)
+    
+    // Allow for async navigation
+    try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
+    
+    #expect(coordinator.selectedTab == .cart)
+    #expect(coordinator.cartPath.count == 1)
+    #expect(coordinator.searchPath.count == 1) // Search path unchanged
+    #expect(coordinator.activeSheet != nil) // Sheet still active
+    
+    // 5. Dismiss sheet
+    coordinator.dismissSheet()
+    #expect(coordinator.activeSheet == nil)
+    
+    // 6. Navigate back in cart
+    coordinator.navigateBack()
+    #expect(coordinator.cartPath.isEmpty)
+    #expect(coordinator.searchPath.count == 1) // Search path still unchanged
   }
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct FilterParameters {
+struct FilterParameters: Hashable {
   let distance: Double
   let selectedStoreIds: Set<Int>
   let showCompleteOnly: Bool

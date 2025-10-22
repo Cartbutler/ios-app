@@ -94,7 +94,12 @@ struct ShoppingResultsView: View {
     if viewModel.isFilterAvailable {
       ToolbarItem(placement: .topBarTrailing) {
         Button {
-          isFilterSheetPresented = true
+          coordinator.presentSheet(
+            .shoppingResultsFilter(
+              stores: viewModel.availableStores,
+              filterParameters: $viewModel.filterParameters
+            )
+          )
         } label: {
           Image(systemName: "line.3.horizontal.decrease")
             .font(.title2)

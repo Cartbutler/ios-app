@@ -8,10 +8,13 @@ import SwiftUI
 
 @MainActor
 class TabCoordinator: ObservableObject {
+  @Published var activeSheet: SheetDestination?
   @Published var selectedTab: Tab = .search
-  @Published var searchPath = NavigationPath()
-  @Published var cartPath = NavigationPath()
+  
   @Published var accountPath = NavigationPath()
+  @Published var cartPath = NavigationPath()
+  @Published var searchPath = NavigationPath()
+  @Published var sheetPath = NavigationPath()
   
   enum Tab: Hashable {
     case search
@@ -63,6 +66,44 @@ class TabCoordinator: ObservableObject {
       accountPath.removeLast(accountPath.count)
     }
   }
+  
+  // MARK: - Sheet Management
+  
+  func presentSheet(_ sheet: SheetDestination) {
+    activeSheet = sheet
+  }
+  
+  func dismissSheet() {
+    activeSheet = nil
+    sheetPath = NavigationPath() // Clear path on dismiss
+  }
+  
+  func navigateInSheet(to destination: some Hashable) {
+    sheetPath.append(destination)
+  }
+  
+  func navigateBackInSheet() {
+    if !sheetPath.isEmpty {
+      sheetPath.removeLast()
+    }
+  }
+  
+  func navigateToSheetRoot() {
+    sheetPath.removeLast(sheetPath.count)
+  }
+  
+  // Check if we can navigate back in the current context
+  var canNavigateBack: Bool {
+    if activeSheet != nil {
+      return !sheetPath.isEmpty
+    } else {
+      switch selectedTab {
+      case .search: return !searchPath.isEmpty
+      case .cart: return !cartPath.isEmpty
+      case .account: return !accountPath.isEmpty
+      }
+    }
+  }
 }
 
 extension View {
@@ -97,6 +138,55 @@ enum AppDestination: Hashable {
     switch self {
     case .shoppingResults:
       ShoppingResultsView()
+    }
+  }
+}
+
+enum SheetDestination: Hashable, Identifiable {
+  case shoppingResultsFilter(stores: [StoreFilterDTO], filterParameters: Binding<FilterParameters?>)
+  
+  static func == (lhs: Self, rhs: Self) -> Bool {
+    switch (lhs, rhs) {
+    case (.shoppingResultsFilter(let lhsStores, let lhsFilterParameters),
+          .shoppingResultsFilter(let rhsStores, let rhsFilterParameters)):
+      return lhsStores == rhsStores && lhsFilterParameters.wrappedValue == rhsFilterParameters.wrappedValue
+    }
+  }
+  
+  func hash(into hasher: inout Hasher) {
+    switch self {
+    case .shoppingResultsFilter(let stores , let filters):
+      hasher.combine(stores)
+      hasher.combine(filters.wrappedValue)
+    }
+  }
+  
+  var id: Self { self }
+  
+  @MainActor
+  @ViewBuilder
+  var view: some View {
+    switch self {
+    case .shoppingResultsFilter(let stores, let filterParameters):
+      SheetWithNavigationView {
+        ShoppingResultsFilterView(
+          stores: stores,
+          filterParameters: filterParameters
+        )
+      }
+    }
+  }
+  
+}
+
+struct SheetWithNavigationView<Content: View>: View {
+  @EnvironmentObject var coordinator: TabCoordinator
+  @ViewBuilder let content: () -> Content
+  
+  var body: some View {
+    NavigationStack(path: $coordinator.sheetPath) {
+      content()
+        .withAppNavigation()
     }
   }
 }
